@@ -1,0 +1,23 @@
+{
+    "name" : "take",
+    "version" : "0.0.1",
+    "description" : "Unpack multibyte binary values from buffers",
+    "modules" : {
+        "index" : "./index.js",
+    },
+    "repository" : {
+        "type" : "git",
+        "url" : "http://github.com/substack/node-take.git"
+    },
+    "keywords": [
+        "binary",
+        "decode",
+        "endian",
+        "unpack"
+    ],
+    "dependencies" : {
+        "chainsaw" : ">0.0.3"
+    },
+    "license" : "MIT/X11",
+    "engine" : ["node >=0.2.0"]
+}
