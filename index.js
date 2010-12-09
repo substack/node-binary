@@ -14,6 +14,7 @@ module.exports = function Take (buf) {
                 return function (name) {
                     vars[name] = cb(buf.slice(offset, bytes));
                     offset += bytes;
+                    saw.next();
                 };
             }
             
@@ -37,7 +38,7 @@ module.exports = function Take (buf) {
         self.word8s = self.word8bs;
         
         self.tap = function (cb) {
-            cb(vars);
+            saw.nest(cb, vars);
         };
     });
 };
