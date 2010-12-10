@@ -88,6 +88,9 @@ exports.split = function (assert) {
     }, 40);
 };
 
+exports.posls = function (assert) {
+};
+
 exports.negls = function (assert) {
     var to = setTimeout(function () {
         assert.fail('never tapped');
@@ -99,22 +102,22 @@ exports.negls = function (assert) {
         226, // a == -30
         219, 246, // b == -2341
         236, 245, 243, 255, // c == -789012
-        //63, 52, 222, 16, 203, 254, 210, 255, // d == -12667700813876161
+        63, 52, 222, 16, 203, 254, 210, 255, // d == -12667700813876161
     ]);
     
     Binary(buf)
         .word8ls('a')
         .word16ls('b')
         .word32ls('c')
-        //.word64ls('d')
+        .word64ls('d')
         .tap(function (vars) {
             clearTimeout(to);
-            assert.eql(vars, {
-                a : -30,
-                b : -2341,
-                c : -789012,
-                //d : -12667700813876161,
-            });
+            assert.eql(vars.a, -30);
+            assert.eql(vars.b, -2341);
+            assert.eql(vars.c, -789012);
+            assert.ok(
+                Math.abs(vars.d - -12667700813876161) < 1000
+            );
         })
     ;
 };
