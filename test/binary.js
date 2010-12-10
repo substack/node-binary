@@ -87,3 +87,32 @@ exports.split = function (assert) {
         em.emit('data', new Buffer([ 13, 3, 100 ]));
     }, 40);
 };
+
+exports.negls = function (assert) {
+    var to = setTimeout(function () {
+        assert.fail('never tapped');
+    }, 50);
+    
+    var buf = new Buffer([
+        226, // a == -30
+        219, 246, // b == -2341
+        236, 245, 243, 255, // c == -789012
+        63, 52, 222, 16, 203, 254, 210, 255, // d == -12667700813876161
+    ]);
+    
+    Binary(buf)
+        .word8ls('a')
+        .word16ls('b')
+        .word32ls('c')
+        .word64ls('d')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars, {
+                a : 226,
+                b : -2341,
+                c : -789012,
+                d : -12667700813876161,
+            });
+        })
+    ;
+};
