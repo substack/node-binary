@@ -6,18 +6,21 @@ module.exports = function Take (bufOrEm) {
     var rem = { buf : null, offset : 0 };
     
     function getBytes (bytes, cb) {
-        active.buf = new Buffer(bytes);
+        active = {
+            buf : new Buffer(bytes),
+            offset : 0,
+            cb : cb,
+        };
         
-        if (!rem.buf) {
-            active.cb = cb;
-        }
+        if (!rem.buf) { }
         else if (bytes === rem.buf.length - rem.offset) {
             // exactly enough data in the remainder
+            active.cb = null;
             cb(rem.buf.slice(rem.offset, rem.buf.length));
         }
         else if (bytes > rem.buf.length - rem.offset) {
             // more data requested than in the remainder
-            rem.copy(active.buf, active.offset, rem.offset);
+            rem.buf.copy(active.buf, active.offset, rem.offset);
             active.offset += rem.buf.length - rem.offset;
             rem = { buf : null, offset : 0 };
         }
@@ -26,6 +29,7 @@ module.exports = function Take (bufOrEm) {
             var buf = rem.buf.slice(rem.offset, rem.offset + bytes);
             active.offset += rem.buf.length;
             rem.offset += bytes;
+            active.cb = null;
             cb(buf);
         }
     }
@@ -72,6 +76,7 @@ module.exports = function Take (bufOrEm) {
             else {
                 rem.buf = buf.slice(len, buf.length);
             }
+            
             active.cb(active.buf);
         }
     });
