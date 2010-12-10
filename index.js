@@ -1,7 +1,7 @@
 var Chainsaw = require('chainsaw');
 var EventEmitter = require('events').EventEmitter;
 
-module.exports = function Take (bufOrEm) {
+module.exports = function (bufOrEm) {
     var active = { buf : null, offset : 0, cb : null };
     var rem = { buf : null, offset : 0 };
     

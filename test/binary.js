@@ -1,4 +1,4 @@
-var Take = require('take');
+var Binary = require('binary');
 var EventEmitter = require('events').EventEmitter;
 
 exports.buffer = function (assert) {
@@ -6,7 +6,7 @@ exports.buffer = function (assert) {
         assert.fail('never tapped');
     }, 50);
     
-    Take(new Buffer([ 97, 98, 99 ]))
+    Binary(new Buffer([ 97, 98, 99 ]))
         .word8('a')
         .word16be('bc')
         .tap(function (vars) {
@@ -22,7 +22,7 @@ exports.immediate = function (assert) {
     }, 50);
     
     var em = new EventEmitter;
-    Take(em)
+    Binary(em)
         .word8('a')
         .word16be('bc')
         .tap(function (vars) {
@@ -40,7 +40,7 @@ exports.deferred = function (assert) {
     }, 50);
     
     var em = new EventEmitter;
-    Take(em)
+    Binary(em)
         .word8('a')
         .word16be('bc')
         .tap(function (vars) {
@@ -60,7 +60,7 @@ exports.split = function (assert) {
     }, 50);
     
     var em = new EventEmitter;
-    Take(em)
+    Binary(em)
         .word8('a')
         .word16be('bc')
         .tap(function (vars) {

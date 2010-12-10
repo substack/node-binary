@@ -1,5 +1,5 @@
 {
-    "name" : "take",
+    "name" : "binary",
     "version" : "0.0.1",
     "description" : "Unpack multibyte binary values from buffers",
     "modules" : {
@@ -7,7 +7,7 @@
     },
     "repository" : {
         "type" : "git",
-        "url" : "http://github.com/substack/node-take.git"
+        "url" : "http://github.com/substack/node-binary.git"
     },
     "keywords": [
         "binary",
