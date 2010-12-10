@@ -28,6 +28,42 @@ buf.js
     $ node buf.js
     { ab: 25185, cf: 1667523942, x: 0 }
 
+Methods
+=======
+
+Binary(buf)
+-----------
+
+Start a new chain parser for a `Buffer`.
+
+Binary(emitter)
+---------------
+Binary(emitter, eventName='data')
+---------------------------------
+
+Start a new chain parser for an `EventEmitter` for an event name `eventName`,
+which defaults to `'data'`.
+
+word{8,16,32,64}{l,b}{e,u,s}(name)
+----------------------------------
+
+Parse bytes in the buffer or stream given:
+
+# number of bits
+# endianness ( l : little, b : big ),
+# signedness ( u and e : unsigned, s : signed )
+
+These functions won't start parsing until all previous parser functions have run
+and the data is available.
+
+The result of the parse goes into the variable stash at `name`.
+
+tap(cb)
+-------
+
+The callback `cb` is provided with the variable stash from all the previous
+actions once they've all finished.
+
 Installation
 ============
 
