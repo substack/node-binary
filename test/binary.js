@@ -89,6 +89,34 @@ exports.split = function (assert) {
 };
 
 exports.posls = function (assert) {
+    var to = setTimeout(function () {
+        assert.fail('never tapped');
+    }, 50);
+    
+    // note: can't store 12667700813876161 exactly in an ieee float
+    
+    var buf = new Buffer([
+        30, // a == -30
+        37, 9, // b == -2341
+        20, 10, 12, 0, // c == -789012
+        193, 203, 33, 239, 52, 1, 45, 0, // d == 12667700813876161
+    ]);
+    
+    Binary(buf)
+        .word8ls('a')
+        .word16ls('b')
+        .word32ls('c')
+        .word64ls('d')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars.a, 30);
+            assert.eql(vars.b, 2341);
+            assert.eql(vars.c, 789012);
+            assert.ok(
+                Math.abs(vars.d - 12667700813876161) < 1000
+            );
+        })
+    ;
 };
 
 exports.negls = function (assert) {
