@@ -44,7 +44,7 @@ module.exports = function Take (bufOrEm) {
             else {
                 rem = { buf : buf, offset : 0 };
             }
-            active.buf
+            
             return;
         }
         var len = active.buf.length - active.offset;
@@ -68,6 +68,9 @@ module.exports = function Take (bufOrEm) {
             if (rem.buf && rem.buf.length > 0) {
                 var rbuf = new Buffer(rlen + rem.buf.length);
                 rem.buf.copy(rbuf, 0, rem.offset);
+            }
+            else {
+                rem.buf = buf.slice(len, buf.length);
             }
             active.cb(active.buf);
         }
