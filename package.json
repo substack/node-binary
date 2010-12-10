@@ -13,7 +13,9 @@
         "binary",
         "decode",
         "endian",
-        "unpack"
+        "unpack",
+        "signed",
+        "unsigned"
     ],
     "dependencies" : {
         "chainsaw" : ">0.0.3"

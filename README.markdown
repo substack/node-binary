@@ -69,9 +69,9 @@ word{8,16,32,64}{l,b}{e,u,s}(name)
 
 Parse bytes in the buffer or stream given:
 
-# number of bits
-# endianness ( l : little, b : big ),
-# signedness ( u and e : unsigned, s : signed )
+* number of bits
+* endianness ( l : little, b : big ),
+* signedness ( u and e : unsigned, s : signed )
 
 These functions won't start parsing until all previous parser functions have run
 and the data is available.
