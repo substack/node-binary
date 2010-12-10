@@ -16,7 +16,7 @@ exports.buffer = function (assert) {
     ;
 };
 
-exports.stream = function (assert) {
+exports['immediate stream'] = function (assert) {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -31,5 +31,5 @@ exports.stream = function (assert) {
         })
     ;
     
-    em.emit(new Buffer([ 97, 98, 99 ]));
+    em.emit('data', new Buffer([ 97, 98, 99 ]));
 };

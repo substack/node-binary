@@ -18,13 +18,13 @@ module.exports = function Take (bufOrEm) {
         else if (bytes > rem.buf.length - rem.offset) {
             // more data requested than in the remainder
             rem.copy(active.buf, active.offset, rem.offset);
-            active.offset += rem.length - rem.offset;
+            active.offset += rem.buf.length - rem.offset;
             rem = { buf : null, offset : 0 };
         }
         else {
             // less data requested than in the remainder
             var buf = rem.buf.slice(rem.offset, rem.offset + bytes);
-            active.offset += rem.length;
+            active.offset += rem.buf.length;
             rem.offset += bytes;
             cb(buf);
         }
