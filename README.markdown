@@ -28,6 +28,26 @@ buf.js
     $ node buf.js
     { ab: 25185, cf: 1667523942, x: 0 }
 
+stream.js
+---------
+
+    var Binary = require('binary');
+    var stdin = process.openStdin();
+    
+    Binary(stdin)
+        .word32lu('x')
+        .word16bs('y')
+        .word16bu('z')
+        .tap(function (vars) {
+            console.dir(vars);
+        })
+    ;
+-
+    $ node examples/stream.js
+    abcdefgh
+    { x: 1684234849, y: 25958, z: 26472 }
+    ^D
+
 Methods
 =======
 
