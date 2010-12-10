@@ -93,25 +93,27 @@ exports.negls = function (assert) {
         assert.fail('never tapped');
     }, 50);
     
+    // note: can't store -12667700813876161 exactly in an ieee float
+    
     var buf = new Buffer([
         226, // a == -30
         219, 246, // b == -2341
         236, 245, 243, 255, // c == -789012
-        63, 52, 222, 16, 203, 254, 210, 255, // d == -12667700813876161
+        //63, 52, 222, 16, 203, 254, 210, 255, // d == -12667700813876161
     ]);
     
     Binary(buf)
         .word8ls('a')
         .word16ls('b')
         .word32ls('c')
-        .word64ls('d')
+        //.word64ls('d')
         .tap(function (vars) {
             clearTimeout(to);
             assert.eql(vars, {
-                a : 226,
+                a : -30,
                 b : -2341,
                 c : -789012,
-                d : -12667700813876161,
+                //d : -12667700813876161,
             });
         })
     ;
