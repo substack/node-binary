@@ -1,7 +1,9 @@
 var Chainsaw = require('chainsaw');
 var EventEmitter = require('events').EventEmitter;
 
-module.exports = function (bufOrEm) {
+module.exports = function (bufOrEm, eventName) {
+    if (eventName === undefined) eventName = 'data';
+    
     var active = { buf : null, offset : 0, cb : null };
     var rem = { buf : null, offset : 0 };
     
@@ -37,7 +39,7 @@ module.exports = function (bufOrEm) {
     var em = bufOrEm instanceof EventEmitter
         ? bufOrEm : new EventEmitter;
     
-    em.on('data', function (buf) {
+    em.on(eventName, function (buf) {
         if (active.buf === null) {
             if (rem.buf) {
                 var rbuf = new Buffer(rem.buf.length - rem.offset + buf.length);
@@ -82,7 +84,7 @@ module.exports = function (bufOrEm) {
     });
     
     if (bufOrEm instanceof Buffer) {
-        em.emit('data', bufOrEm);
+        em.emit(eventName, bufOrEm);
     }
     
     var vars = {};

@@ -22,7 +22,7 @@ exports.immediate = function (assert) {
     }, 50);
     
     var em = new EventEmitter;
-    Binary(em)
+    Binary(em, 'moo')
         .word8('a')
         .word16be('bc')
         .tap(function (vars) {
@@ -31,7 +31,7 @@ exports.immediate = function (assert) {
         })
     ;
     
-    em.emit('data', new Buffer([ 97, 98, 99 ]));
+    em.emit('moo', new Buffer([ 97, 98, 99 ]));
 };
 
 exports.deferred = function (assert) {
