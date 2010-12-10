@@ -16,7 +16,7 @@ exports.buffer = function (assert) {
     ;
 };
 
-exports['immediate stream'] = function (assert) {
+exports.immediate = function (assert) {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -32,4 +32,24 @@ exports['immediate stream'] = function (assert) {
     ;
     
     em.emit('data', new Buffer([ 97, 98, 99 ]));
+};
+
+exports.deferred = function (assert) {
+    var to = setTimeout(function () {
+        assert.fail('never tapped');
+    }, 50);
+    
+    var em = new EventEmitter;
+    Take(em)
+        .word8('a')
+        .word16be('bc')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars, { a : 97, bc : 25187 });
+        })
+    ;
+    
+    setTimeout(function () {
+        em.emit('data', new Buffer([ 97, 98, 99 ]));
+    }, 10);
 };
