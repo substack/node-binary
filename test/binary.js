@@ -63,9 +63,16 @@ exports.split = function (assert) {
     Binary(em)
         .word8('a')
         .word16be('bc')
+        .word32ls('x')
+        .word32bs('y')
         .tap(function (vars) {
             clearTimeout(to);
-            assert.eql(vars, { a : 97, bc : 25187 });
+            assert.eql(vars, {
+                a : 97,
+                bc : 25187,
+                x : 621609828,
+                y : 621609828,
+            });
         })
     ;
     
@@ -73,4 +80,10 @@ exports.split = function (assert) {
     setTimeout(function () {
         em.emit('data', new Buffer([ 99, 100 ]));
     }, 25);
+    setTimeout(function () {
+        em.emit('data', new Buffer([ 3, 13, 37, 37 ]));
+    }, 30);
+    setTimeout(function () {
+        em.emit('data', new Buffer([ 13, 3, 100 ]));
+    }, 40);
 };

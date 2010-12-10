@@ -147,7 +147,7 @@ function decodeBEu (bytes) {
 
 // convert byte strings to signed big endian numbers
 function decodeBEs (bytes) {
-    var val = decodeBE(bytes);
+    var val = decodeBEu(bytes);
     if ((bytes[0] & 0x80) == 0x80) {
         val -= Math.pow(256, bytes.length);
     }
@@ -156,7 +156,7 @@ function decodeBEs (bytes) {
 
 // convert byte strings to signed little endian numbers
 function decodeLEs (bytes) {
-    var val = decodeLE(bytes);
+    var val = decodeLEu(bytes);
     if ((bytes[bytes.length-1] & 0x80) == 0x80) {
         val -= Math.pow(256, bytes.length);
     }
