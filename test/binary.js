@@ -211,3 +211,51 @@ exports.negbs = function (assert) {
         })
     ;
 };
+
+exports.lu = function (assert) {
+    var to = setTimeout(function () {
+        assert.fail('never tapped');
+    }, 50);
+    
+    // note: can't store -12667700813876161 exactly in an ieee float
+    
+    var buf = new Buffer([
+        44, // a == 44
+        43, 2, // b == 555
+        37, 37, 213, 164, // c == 2765432101
+        193, 203, 115, 155, 20, 180, 81, 29, // d == 2112667700813876161
+    ]);
+    
+    Binary(buf)
+        .word8lu('a')
+        .word16lu('b')
+        .word32lu('c')
+        .word64lu('d')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars.a, 44);
+            assert.eql(vars.b, 555);
+            assert.eql(vars.c, 2765432101);
+            assert.ok(
+                Math.abs(vars.d - 2112667700813876161) < 1500
+            );
+        })
+    ;
+    
+    // also check aliases here:
+    Binary(buf)
+        .word8('a')
+        .word16le('b')
+        .word32le('c')
+        .word64le('d')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars.a, 44);
+            assert.eql(vars.b, 555);
+            assert.eql(vars.c, 2765432101);
+            assert.ok(
+                Math.abs(vars.d - 2112667700813876161) < 1500
+            );
+        })
+    ;
+};
