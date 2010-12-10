@@ -1,5 +1,4 @@
-//var Take = require('take');
-var Take = require('../index');
+var Take = require('take');
 
 exports.take = function (assert) {
     var to = setTimeout(function () {
@@ -11,7 +10,7 @@ exports.take = function (assert) {
         .word16be('bc')
         .tap(function (vars) {
             clearTimeout(to);
-            assert.eql(vars, { a : 97, bc : 453 });
+            assert.eql(vars, { a : 97, bc : 25187 });
         })
     ;
 };

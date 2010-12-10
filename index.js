@@ -1,7 +1,81 @@
 var Chainsaw = require('chainsaw');
+var EventEmitter = require('events').EventEmitter;
 
-module.exports = function Take (buf) {
-    var offset = 0;
+module.exports = function Take (bufOrEm) {
+    var active = { buf : null, offset : 0, cb : null };
+    var rem = { buf : null, offset : 0 };
+    
+    function getBytes (n, cb) {
+        active.buf = new Buffer(n);
+        
+        if (!rem.buf) {
+            active.cb = cb;
+        }
+        else if (n === rem.buf.length - rem.offset) {
+            cb(rem) // exactly enough data in the remainder
+        }
+        else if (n > rem.buf.length - rem.offset) {
+            // more data requested than in the remainder
+            rem.copy(active.buf, active.offset, rem.offset);
+            active.offset += rem.length - rem.offset;
+            rem = { buf : null, offset : 0 };
+        }
+        else {
+            // less data requested than in the remainder
+            var buf = rem.buf.slice(rem.offset, rem.offset + n);
+            active.offset += rem.length;
+            rem.offset += n;
+            cb(buf);
+        }
+    }
+    
+    var em = bufOrEm instanceof EventEmitter
+        ? bufOrEm : new EventEmitter;
+    
+    em.on('data', function (buf) {
+        if (active.buf === null) {
+            if (rem.buf) {
+                var rbuf = new Buffer(rem.buf.length - rem.offset + buf.length);
+                rem.buf.copy(rbuf, 0, rem.offset);
+                buf.copy(rbuf, rem.offset, 0);
+                rem = { buf : rbuf, offset : 0 };
+            }
+            else {
+                rem = { buf : buf, offset : 0 };
+            }
+            active.buf
+            return;
+        }
+        var len = active.buf.length - active.offset;
+        
+        if (len === buf.length) {
+            if (active.offset === 0) {
+                active.cb(buf);
+            }
+            else {
+                buf.copy(active.buf, active.offset, 0);
+                active.cb(active.buf);
+            }
+        }
+        else if (len > buf.length) {
+            buf.copy(active.buf, active.offset, 0);
+        }
+        else {
+            buf.copy(active.buf, active.offset, 0, len);
+            var rlen = buf.length - len;
+            
+            if (rem.buf && rem.buf.length > 0) {
+                var rbuf = new Buffer(rlen + rem.buf.length);
+                rem.buf.copy(rbuf, 0, rem.offset);
+            }
+            active.cb(active.buf);
+        }
+    });
+    
+    if (bufOrEm instanceof Buffer) {
+        em.emit('data', bufOrEm);
+    }
+    
     var vars = {};
     
     return Chainsaw(function (saw) {
@@ -12,9 +86,10 @@ module.exports = function Take (buf) {
             
             function decode (cb) {
                 return function (name) {
-                    vars[name] = cb(buf.slice(offset, bytes));
-                    offset += bytes;
-                    saw.next();
+                    getBytes(bytes, function (buf) {
+                        vars[name] = buf;
+                        saw.next();
+                    });
                 };
             }
             
