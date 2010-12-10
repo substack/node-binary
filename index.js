@@ -5,16 +5,17 @@ module.exports = function Take (bufOrEm) {
     var active = { buf : null, offset : 0, cb : null };
     var rem = { buf : null, offset : 0 };
     
-    function getBytes (n, cb) {
-        active.buf = new Buffer(n);
+    function getBytes (bytes, cb) {
+        active.buf = new Buffer(bytes);
         
         if (!rem.buf) {
             active.cb = cb;
         }
-        else if (n === rem.buf.length - rem.offset) {
-            cb(rem) // exactly enough data in the remainder
+        else if (bytes === rem.buf.length - rem.offset) {
+            // exactly enough data in the remainder
+            cb(rem.buf.slice(rem.offset, rem.buf.length));
         }
-        else if (n > rem.buf.length - rem.offset) {
+        else if (bytes > rem.buf.length - rem.offset) {
             // more data requested than in the remainder
             rem.copy(active.buf, active.offset, rem.offset);
             active.offset += rem.length - rem.offset;
@@ -22,9 +23,9 @@ module.exports = function Take (bufOrEm) {
         }
         else {
             // less data requested than in the remainder
-            var buf = rem.buf.slice(rem.offset, rem.offset + n);
+            var buf = rem.buf.slice(rem.offset, rem.offset + bytes);
             active.offset += rem.length;
-            rem.offset += n;
+            rem.offset += bytes;
             cb(buf);
         }
     }
@@ -87,7 +88,7 @@ module.exports = function Take (bufOrEm) {
             function decode (cb) {
                 return function (name) {
                     getBytes(bytes, function (buf) {
-                        vars[name] = buf;
+                        vars[name] = cb(buf);
                         saw.next();
                     });
                 };
