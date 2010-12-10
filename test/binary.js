@@ -149,3 +149,65 @@ exports.negls = function (assert) {
         })
     ;
 };
+
+exports.posbs = function (assert) {
+    var to = setTimeout(function () {
+        assert.fail('never tapped');
+    }, 50);
+    
+    // note: can't store 12667700813876161 exactly in an ieee float
+    
+    var buf = new Buffer([
+        30, // a == -30
+        9, 37, // b == -2341
+        0, 12, 10, 20, // c == -789012
+        0, 45, 1, 52, 239, 33, 203, 193, // d == 12667700813876161
+    ]);
+    
+    Binary(buf)
+        .word8bs('a')
+        .word16bs('b')
+        .word32bs('c')
+        .word64bs('d')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars.a, 30);
+            assert.eql(vars.b, 2341);
+            assert.eql(vars.c, 789012);
+            assert.ok(
+                Math.abs(vars.d - 12667700813876161) < 1000
+            );
+        })
+    ;
+};
+
+exports.negbs = function (assert) {
+    var to = setTimeout(function () {
+        assert.fail('never tapped');
+    }, 50);
+    
+    // note: can't store -12667700813876161 exactly in an ieee float
+    
+    var buf = new Buffer([
+        226, // a == -30
+        246, 219, // b == -2341
+        255, 243, 245, 236, // c == -789012
+        255, 210, 254, 203, 16, 222, 52, 63, // d == -12667700813876161
+    ]);
+    
+    Binary(buf)
+        .word8bs('a')
+        .word16bs('b')
+        .word32bs('c')
+        .word64bs('d')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars.a, -30);
+            assert.eql(vars.b, -2341);
+            assert.eql(vars.c, -789012);
+            assert.ok(
+                Math.abs(vars.d - -12667700813876161) < 1500
+            );
+        })
+    ;
+};
