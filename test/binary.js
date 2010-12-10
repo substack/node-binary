@@ -244,10 +244,58 @@ exports.lu = function (assert) {
     
     // also check aliases here:
     Binary(buf)
-        .word8('a')
+        .word8le('a')
         .word16le('b')
         .word32le('c')
         .word64le('d')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars.a, 44);
+            assert.eql(vars.b, 555);
+            assert.eql(vars.c, 2765432101);
+            assert.ok(
+                Math.abs(vars.d - 2112667700813876161) < 1500
+            );
+        })
+    ;
+};
+
+exports.bu = function (assert) {
+    var to = setTimeout(function () {
+        assert.fail('never tapped');
+    }, 50);
+    
+    // note: can't store -12667700813876161 exactly in an ieee float
+    
+    var buf = new Buffer([
+        44, // a == 44
+        2, 43, // b == 555
+        164, 213, 37, 37, // c == 2765432101
+        29, 81, 180, 20, 155, 115, 203, 193, // d == 2112667700813876161
+    ]);
+    
+    Binary(buf)
+        .word8bu('a')
+        .word16bu('b')
+        .word32bu('c')
+        .word64bu('d')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars.a, 44);
+            assert.eql(vars.b, 555);
+            assert.eql(vars.c, 2765432101);
+            assert.ok(
+                Math.abs(vars.d - 2112667700813876161) < 1500
+            );
+        })
+    ;
+    
+    // also check aliases here:
+    Binary(buf)
+        .word8be('a')
+        .word16be('b')
+        .word32be('c')
+        .word64be('d')
         .tap(function (vars) {
             clearTimeout(to);
             assert.eql(vars.a, 44);
