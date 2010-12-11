@@ -18,7 +18,9 @@ module.exports = function (bufOrEm, eventName) {
         else if (bytes === rem.buf.length - rem.offset) {
             // exactly enough data in the remainder
             active.cb = null;
-            cb(rem.buf.slice(rem.offset, rem.buf.length));
+            var buf = rem.buf.slice(rem.offset, rem.buf.length);
+            rem = { buf : null, offset : 0 };
+            cb(buf);
         }
         else if (bytes > rem.buf.length - rem.offset) {
             // more data requested than in the remainder

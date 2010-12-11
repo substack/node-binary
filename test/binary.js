@@ -322,13 +322,14 @@ exports.loop = function (assert) {
                 .word8u('b')
                 .word8s('c')
                 .tap(function (vars) {
+                    times ++;
                     if (vars.c < 0) end();
                 })
             ;
         })
         .tap(function (vars) {
             clearTimeout(to);
-            assert.eql(vars, { a : 1337, b : 55, c : -1 });
+            assert.eql(vars, { a : 1337, b : 55, c : -5 });
             assert.eql(times, 4);
         })
     ;
@@ -340,13 +341,13 @@ exports.loop = function (assert) {
         em.emit('data', new Buffer([ 100, 3, 6, 242, 30 ]));
     }, 20);
     setTimeout(function () {
-        em.emit('data', new Buffer([ 60, 60, 199, 127 ]));
+        em.emit('data', new Buffer([ 60, 60, 199, 44 ]));
     }, 30);
     
     setTimeout(function () {
         em.emit('data', new Buffer([ 57, 5 ]));
     }, 80);
     setTimeout(function () {
-        em.emit('data', new Buffer([ 55, 255 ]));
+        em.emit('data', new Buffer([ 55, 251 ]));
     }, 90);
 };
