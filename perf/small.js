@@ -1,8 +1,11 @@
+var Seq = require('seq');
+var Hash = require('traverse/hash');
+
 var Bin = require('binary');
 var Buf = require('bufferlist/binary');
 var BufferList = require('bufferlist');
 
-exports.bin = function binary (buf, cb) {
+function binary (buf, cb) {
     Bin(buf)
         .word32le('x')
         .word16be('y')
@@ -12,7 +15,7 @@ exports.bin = function binary (buf, cb) {
     ;
 };
 
-exports.buf = function bufferlist (buf, cb) {
+function bufferlist (buf, cb) {
     var blist = new BufferList;
     blist.push(buf);
     Buf(blist)
@@ -24,3 +27,31 @@ exports.buf = function bufferlist (buf, cb) {
         .end()
     ;
 };
+
+
+var buffers = [];
+for (var i = 0; i < 200; i++) {
+    buffers.push(new Buffer(12));
+}
+
+console.log('small');
+Seq(binary, bufferlist)
+    .seqEach(function (f) {
+        var t = this;
+        var t0 = Date.now();
+        Seq()
+            .extend(buffers)
+            .seqEach(function (buf) {
+                f(buf, this.bind(this, null));
+            })
+            .seq(function () {
+                var tf = Date.now();
+                console.log('    ' + f.name + ': ' + (tf - t0));
+                t(null);
+            })
+        ;
+    })
+    .seq(function () {
+        this(null);
+    })
+;
