@@ -14,19 +14,17 @@ function emitter () {
     var iv = setInterval(function () {
         var buf = new Buffer(1000);
         buf[0] = 0xff;
-        em.emit('data', buf);
         
         if (++ i >= 1000) {
             buf[0] = 0;
             clearInterval(iv);
         }
         em.emit('data', buf);
-    }, 5);
+    }, 1);
     
     return em;
 }
 
-/*
 Seq()
     .seq(function () {
         var next = this.bind({}, null);
@@ -37,9 +35,6 @@ Seq()
         bufferlist(next);
     })
 ;
-*/
-
-binary(function () {});
 
 function binary (next) {
     var em = emitter();
@@ -58,7 +53,6 @@ function binary (next) {
                 if (vars.x === 0) {
                     var tf = Date.now();
                     console.log('    binary: ' + (tf - t0));
-                    console.log('        loops : ' + loops);
                     end();
                     setTimeout(next, 20);
                 }
