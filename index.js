@@ -142,6 +142,17 @@ module.exports = function (bufOrEm, eventName) {
             
             cb.call(s.chain(), function () { end = true }, vars);
         };
+        
+        self.buffer = function (name, size) {
+            if (typeof size === 'string') {
+                size = vars[size];
+            }
+            
+            getBytes(size, function (buf) {
+                vars[name] = buf;
+                saw.next();
+            });
+        };
     });
 };
 
