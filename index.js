@@ -89,7 +89,7 @@ module.exports = function (bufOrEm, eventName) {
     
     var vars = {};
     
-    return Chainsaw(function (saw) {
+    return Chainsaw(function builder (saw) {
         var self = this;
         
         [ 1, 2, 4, 8 ].forEach(function (bytes) {
@@ -125,6 +125,23 @@ module.exports = function (bufOrEm, eventName) {
         
         self.tap = function (cb) {
             saw.nest(cb, vars);
+        };
+        
+        self.loop = function loop (cb) {
+            var s = Chainsaw.saw(builder, {});
+            
+            var end = false;
+            s.on('end', function () {
+                if (end) saw.next();
+                else loop(cb)
+            });
+            
+            var r = builder.call(s.handlers, s);
+            if (r !== undefined) s.handlers = r;
+            
+            var ch = s.chain();
+            ch.end = function () { end = true };
+            cb.apply(ch, vars);
         };
     });
 };
