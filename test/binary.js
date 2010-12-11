@@ -353,22 +353,31 @@ exports.loop = function (assert) {
 };
 
 exports.getBuffer = function (assert) {
-    var to = setTimeout(function () {
-        assert.fail('buffer never finished');
+    var t1 = setTimeout(function () {
+        assert.fail('first buffer never finished');
     }, 20);
     
-    var buf = new Buffer([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
+    var t2 = setTimeout(function () {
+        assert.fail('second buffer never finished');
+    }, 20);
+    
+    var buf = new Buffer([ 4, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ]);
     Binary(buf)
         .word8('a')
         .buffer('b', 7)
         .word16lu('c')
         .tap(function (vars) {
-            clearTimeout(to);
+            clearTimeout(t1);
             assert.eql(vars, {
-                a : 1, 
+                a : 4, 
                 b : new Buffer([ 2, 3, 4, 5, 6, 7, 8 ]),
                 c : 2569,
             });
+        })
+        .buffer('d', 'a')
+        .tap(function (vars) {
+            clearTimeout(t2);
+            assert.eql(vars.d, new Buffer([ 11, 12, 13, 14 ]));
         })
     ;
 };
