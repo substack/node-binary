@@ -9,14 +9,20 @@ var BufferList = require('bufferlist');
 console.log('loop');
 function emitter () {
     var em = new EventEmitter;
-    process.nextTick(function () {
-        for (var i = 0; i < 1000; i++) {
+    setTimeout(function () {
+        var i = 0;
+        var iv = setInterval(function () {
             var buf = new Buffer(1000);
             buf[0] = 0xff;
             em.emit('data', buf);
-        }
-        em.emit('data', new Buffer([0]));
-    });
+            
+            if (++ i >= 1000) {
+                buf[0] = 0;
+                clearInterval(iv);
+            }
+            em.emit('data', buf);
+        }, 5);
+    }, 50);
     return em;
 }
 
@@ -41,8 +47,9 @@ function binary (next) {
             .word8('y')
             .word32be('z')
             .word32le('w')
-            .buffer('buf', 1000 - 12)
+            .buffer('buf', 1000 - 10)
             .tap(function (vars) {
+console.dir({ x : vars.x, buf : vars.buf.length });
                 if (vars.x === 0) {
                     var tf = Date.now();
                     console.log('    binary: ' + (tf - t0));
@@ -71,7 +78,7 @@ function bufferlist (next) {
             .getWord8('y')
             .getWord32be('z')
             .getWord32le('w')
-            .getBuffer('buf', 1000 - 12)
+            .getBuffer('buf', 1000 - 10)
             .tap(function (vars) {
                 if (vars.x === 0) {
                     var tf = Date.now();
