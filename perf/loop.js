@@ -26,6 +26,7 @@ function emitter () {
     return em;
 }
 
+/*
 Seq()
     .seq(function () {
         var next = this.bind({}, null);
@@ -36,6 +37,9 @@ Seq()
         bufferlist(next);
     })
 ;
+*/
+
+binary(function () {});
 
 function binary (next) {
     var em = emitter();

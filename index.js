@@ -1,92 +1,76 @@
 var Chainsaw = require('chainsaw');
 var EventEmitter = require('events').EventEmitter;
+var Buf = require('./lib/buf.js');
 
 module.exports = function (bufOrEm, eventName) {
     if (eventName === undefined) eventName = 'data';
     
-    var active = { buf : null, offset : 0, cb : null };
-    var rem = { buf : null, offset : 0 };
-    
-    function getBytes (bytes, cb) {
-        active = {
-            buf : new Buffer(bytes),
-            offset : 0,
-            cb : cb,
-        };
-        
-        if (!rem.buf) { }
-        else if (bytes === rem.buf.length - rem.offset) {
-            // exactly enough data in the remainder
-            active.cb = null;
-            var buf = rem.buf.slice(rem.offset, rem.buf.length);
-            rem = { buf : null, offset : 0 };
-            cb(buf);
-        }
-        else if (bytes > rem.buf.length - rem.offset) {
-            // more data requested than in the remainder
-            rem.buf.copy(active.buf, active.offset, rem.offset);
-            active.offset += rem.buf.length - rem.offset;
-            rem = { buf : null, offset : 0 };
-        }
-        else {
-            // less data requested than in the remainder
-            var buf = rem.buf.slice(rem.offset, rem.offset + bytes);
-            rem.offset += bytes;
-            active = { buf : null, offset : 0, cb : null };
-            cb(buf);
-        }
-    }
-    
     var em = bufOrEm instanceof EventEmitter
         ? bufOrEm : new EventEmitter;
     
+    if (bufOrEm instanceof Buffer) {
+        process.nextTick(function () {
+            em.emit(eventName, bufOrEm);
+        });
+    }
+    
+    var pending = null;
+    function getBytes (bytes, cb) {
+        pending = {
+            bytes : bytes,
+            size : bytes,
+            cb : function (buf) {
+                cb(buf);
+                pending = null;
+            }
+        };
+        dispatch();
+    }
+     
+    var active = null;
     em.on(eventName, function (buf) {
-        if (active.buf === null) {
-            if (rem.buf) {
-                var rbuf = new Buffer(rem.buf.length - rem.offset + buf.length);
-                rem.buf.copy(rbuf, 0, rem.offset);
-                buf.copy(rbuf, rem.offset, 0);
-                rem = { buf : rbuf, offset : 0 };
-            }
-            else {
-                rem = { buf : buf, offset : 0 };
-            }
-            
-            return;
-        }
-        var len = active.buf.length - active.offset;
-        
-        if (len === buf.length) {
-            if (active.offset === 0) {
-                active.cb(buf);
-            }
-            else {
-                buf.copy(active.buf, active.offset, 0);
-                active.cb(active.buf);
-            }
-        }
-        else if (len > buf.length) {
-            buf.copy(active.buf, active.offset, 0);
-        }
-        else { // len < buf.length
-            // more data available than requested
-            buf.copy(active.buf, active.offset, 0, len);
-            var rlen = buf.length - len;
-            
-            if (rem.buf && rem.buf.length > 0) {
-                var rbuf = new Buffer(rlen + rem.buf.length);
-                rem.buf.copy(rbuf, 0, rem.offset);
-            }
-            else {
-                rem.buf = buf.slice(len, buf.length);
-            }
-            
-            active.cb(active.buf);
-        }
+        active = Buf(buf);
+        dispatch();
     });
     
-    if (bufOrEm instanceof Buffer) {
-        em.emit(eventName, bufOrEm);
+    function dispatch () {
+        if (!active) return;
+        if (!pending) return;
+        
+        var asize = active.size();
+        var rem = pending.size - pending.bytes;
+        
+        if (asize === pending.bytes) {
+            var buf = active.slice();
+            active = null;
+            
+            if (pending.buffer) {
+                buf.copy(pending.buffer, rem, 0);
+                pending.cb(pending.buffer);
+            }
+            else {
+                pending.cb(buf);
+            }
+        }
+        else if (asize > pending.bytes) {
+            var buf = active.slice(pending.bytes);
+            active.seek(pending.bytes);
+            if (pending.buffer) {
+                buf.copy(pending.buffer, rem, 0, pending.bytes);
+                pending.cb(pending.buffer);
+            }
+            else {
+                pending.cb(buf);
+            }
+        }
+        else if (asize < pending.bytes) {
+            if (!pending.buffer) {
+                pending.buffer = new Buffer(pending.size);
+            }
+            active.slice().copy(pending.buffer, rem, 0);
+            pending.bytes -= asize;
+            active = null;
+        }
     }
     
     var vars = {};
