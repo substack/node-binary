@@ -1,7 +1,7 @@
 var Binary = require('binary');
 var EventEmitter = require('events').EventEmitter;
 
-exports.buffer = function (assert) {
+exports.fromBuffer = function (assert) {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -350,4 +350,18 @@ exports.loop = function (assert) {
     setTimeout(function () {
         em.emit('data', new Buffer([ 55, 251 ]));
     }, 90);
+};
+
+exports.getBuffer = function (assert) {
+    var buf = new Buffer([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
+    Binary(buf)
+        .word8('a')
+        .buffer('b', 7)
+        .word16lu('c')
+        .tap(function (vars) {
+            assert.eql(vars.a, 1);
+            assert.eql(vars.b, new Buffer([ 2, 3, 4, 5, 6, 7, 8 ]));
+            assert.eql(vars.c, 2569);
+        })
+    ;
 };
