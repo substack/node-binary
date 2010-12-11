@@ -307,3 +307,46 @@ exports.bu = function (assert) {
         })
     ;
 };
+
+exports.loop = function (assert) {
+    var em = new EventEmitter;
+    var times = 0;
+    var to = setTimeout(function () {
+        assert.fail('loop never terminated');
+    }, 100);
+    
+    Binary(em)
+        .loop(function (end) {
+            this
+                .word16lu('a')
+                .word8u('b')
+                .word8s('c')
+                .tap(function (vars) {
+                    if (vars.c < 0) end();
+                })
+            ;
+        })
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars, { a : 1337, b : 55, c : -1 });
+            assert.eql(times, 4);
+        })
+    ;
+    
+    setTimeout(function () {
+        em.emit('data', new Buffer([ 2, 10, 88 ]));
+    }, 10);
+    setTimeout(function () {
+        em.emit('data', new Buffer([ 100, 3, 6, 242, 30 ]));
+    }, 20);
+    setTimeout(function () {
+        em.emit('data', new Buffer([ 60, 60, 199, 127 ]));
+    }, 30);
+    
+    setTimeout(function () {
+        em.emit('data', new Buffer([ 57, 5 ]));
+    }, 80);
+    setTimeout(function () {
+        em.emit('data', new Buffer([ 55, 255 ]));
+    }, 90);
+};

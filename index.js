@@ -139,9 +139,7 @@ module.exports = function (bufOrEm, eventName) {
             var r = builder.call(s.handlers, s);
             if (r !== undefined) s.handlers = r;
             
-            var ch = s.chain();
-            ch.end = function () { end = true };
-            cb.apply(ch, vars);
+            cb.call(s.chain(), function () { end = true }, vars);
         };
     });
 };
