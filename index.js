@@ -29,9 +29,8 @@ module.exports = function (bufOrEm, eventName) {
         else {
             // less data requested than in the remainder
             var buf = rem.buf.slice(rem.offset, rem.offset + bytes);
-            active.offset += rem.buf.length;
             rem.offset += bytes;
-            active.cb = null;
+            active = { buf : null, offset : 0, cb : null };
             cb(buf);
         }
     }
