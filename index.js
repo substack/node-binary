@@ -68,7 +68,8 @@ module.exports = function (bufOrEm, eventName) {
         else if (len > buf.length) {
             buf.copy(active.buf, active.offset, 0);
         }
-        else {
+        else { // len < buf.length
+            // more data available than requested
             buf.copy(active.buf, active.offset, 0, len);
             var rlen = buf.length - len;
             

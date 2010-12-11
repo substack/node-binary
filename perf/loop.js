@@ -9,20 +9,20 @@ var BufferList = require('bufferlist');
 console.log('loop');
 function emitter () {
     var em = new EventEmitter;
-    setTimeout(function () {
-        var i = 0;
-        var iv = setInterval(function () {
-            var buf = new Buffer(1000);
-            buf[0] = 0xff;
-            em.emit('data', buf);
-            
-            if (++ i >= 1000) {
-                buf[0] = 0;
-                clearInterval(iv);
-            }
-            em.emit('data', buf);
-        }, 5);
-    }, 50);
+    
+    var i = 0;
+    var iv = setInterval(function () {
+        var buf = new Buffer(1000);
+        buf[0] = 0xff;
+        em.emit('data', buf);
+        
+        if (++ i >= 1000) {
+            buf[0] = 0;
+            clearInterval(iv);
+        }
+        em.emit('data', buf);
+    }, 5);
+    
     return em;
 }
 
@@ -40,6 +40,7 @@ Seq()
 function binary (next) {
     var em = emitter();
     var t0 = Date.now();
+    var loops = 0;
     Bin(em)
         .loop(function (end) {
             this
@@ -49,10 +50,11 @@ function binary (next) {
             .word32le('w')
             .buffer('buf', 1000 - 10)
             .tap(function (vars) {
-console.dir({ x : vars.x, buf : vars.buf.length });
+                loops ++;
                 if (vars.x === 0) {
                     var tf = Date.now();
                     console.log('    binary: ' + (tf - t0));
+                    console.log('        loops : ' + loops);
                     end();
                     setTimeout(next, 20);
                 }
