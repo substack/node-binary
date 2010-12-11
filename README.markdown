@@ -78,6 +78,13 @@ and the data is available.
 
 The result of the parse goes into the variable stash at `name`.
 
+buffer(key, size)
+-----------------
+
+Take `size` bytes directly off the buffer stream, putting the resulting buffer
+slice in the variable stash at `key`. If `size` is a string, use the value at
+`vars[size]`.
+
 tap(cb)
 -------
 
