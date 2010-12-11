@@ -20,8 +20,8 @@ module.exports = function (bufOrEm, eventName) {
             bytes : bytes,
             size : bytes,
             cb : function (buf) {
-                cb(buf);
                 pending = null;
+                cb(buf);
             }
         };
         dispatch();
@@ -53,7 +53,7 @@ module.exports = function (bufOrEm, eventName) {
             }
         }
         else if (asize > pending.bytes) {
-            var buf = active.slice(pending.bytes);
+            var buf = active.slice(0, pending.bytes);
             active.seek(pending.bytes);
             if (pending.buffer) {
                 buf.copy(pending.buffer, rem, 0, pending.bytes);
