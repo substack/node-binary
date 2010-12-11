@@ -12,10 +12,10 @@ function emitter () {
     
     var i = 0;
     var iv = setInterval(function () {
-        var buf = new Buffer(1000);
+        var buf = new Buffer(10000);
         buf[0] = 0xff;
         
-        if (++ i >= 1000) {
+        if (++ i >= 2000) {
             buf[0] = 0;
             clearInterval(iv);
         }
@@ -28,18 +28,18 @@ function emitter () {
 Seq()
     .seq(function () {
         var next = this.bind({}, null);
-        binary(next);
+        bufferlist(next);
     })
     .seq(function () {
         var next = this.bind({}, null);
-        bufferlist(next);
+        binary(next);
     })
 ;
 
 function binary (next) {
     var em = emitter();
     var t0 = Date.now();
-    var loops = 0;
+    
     Bin(em)
         .loop(function (end) {
             this
@@ -47,12 +47,11 @@ function binary (next) {
             .word8('y')
             .word32be('z')
             .word32le('w')
-            .buffer('buf', 1000 - 10)
+            .buffer('buf', 10000 - 10)
             .tap(function (vars) {
-                loops ++;
                 if (vars.x === 0) {
                     var tf = Date.now();
-                    console.log('    binary: ' + (tf - t0));
+                    console.log('    binary: ' + (tf - t0) + ' ms');
                     end();
                     setTimeout(next, 20);
                 }
@@ -78,11 +77,11 @@ function bufferlist (next) {
             .getWord8('y')
             .getWord32be('z')
             .getWord32le('w')
-            .getBuffer('buf', 1000 - 10)
+            .getBuffer('buf', 10000 - 10)
             .tap(function (vars) {
                 if (vars.x === 0) {
                     var tf = Date.now();
-                    console.log('    bufferlist: ' + (tf - t0));
+                    console.log('    bufferlist: ' + (tf - t0) + ' ms');
                     top.exit();
                     setTimeout(next, 20);
                 }
