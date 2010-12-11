@@ -84,6 +84,13 @@ tap(cb)
 The callback `cb` is provided with the variable stash from all the previous
 actions once they've all finished.
 
+loop(cb)
+--------
+
+Loop, each time calling `cb(end, vars)` for function `end` and the variable
+stash with `this` set to a new chain for nested parsing. The loop terminates
+once `end` is called.
+
 Installation
 ============
 

@@ -1,6 +1,6 @@
 {
     "name" : "binary",
-    "version" : "0.0.1",
+    "version" : "0.0.2",
     "description" : "Unpack multibyte binary values from buffers",
     "modules" : {
         "index" : "./index.js",
