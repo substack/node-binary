@@ -17,6 +17,11 @@
         "signed",
         "unsigned"
     ],
+    "author" : {
+        "name" : "James Halliday",
+        "email" : "mail@substack.net",
+        "url" : "http://substack.net"
+    },
     "dependencies" : {
         "chainsaw" : ">0.0.3"
     },
