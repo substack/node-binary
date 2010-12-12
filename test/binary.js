@@ -40,6 +40,24 @@ exports.dots = function (assert) {
     ;
 };
 
+exports.flush = function (assert) {
+    var to = setTimeout(function () {
+        assert.fail('never tapped');
+    }, 50);
+    
+    Binary(new Buffer([ 97, 98, 99, 100, 101, 102 ]))
+        .word8('a')
+        .word16be('b')
+        .word16be('c')
+        .flush()
+        .word8('d')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars, { d : 102 });
+        })
+    ;
+};
+
 exports.immediate = function (assert) {
     var to = setTimeout(function () {
         assert.fail('never tapped');
