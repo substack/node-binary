@@ -73,34 +73,31 @@ module.exports = function (bufOrEm, eventName) {
         }
     }
     
-    var vars = (function () {
-        var store = {};
-        function getset (name, value) {
-            var node = store;
-            var keys = name.split('.');
-            keys.slice(0,-1).forEach(function (k) {
-                if (node[k] === undefined) node[k] = {};
-                node = node[k]
-            });
-            var key = keys[keys.length - 1];
-            if (arguments.length == 1) {
-                return node[key];
-            }
-            else {
-                return node[key] = value;
-            }
+    function getset (name, value) {
+        var node = vars.store;
+        var keys = name.split('.');
+        keys.slice(0,-1).forEach(function (k) {
+            if (node[k] === undefined) node[k] = {};
+            node = node[k]
+        });
+        var key = keys[keys.length - 1];
+        if (arguments.length == 1) {
+            return node[key];
         }
-        
-        return {
-            get : function (name) {
-                return getset(name);
-            },
-            set : function (name, value) {
-                return getset(name, value);
-            },
-            store : store,
-        };
-    })();
+        else {
+            return node[key] = value;
+        }
+    }
+    
+    var vars = {
+        get : function (name) {
+            return getset(name);
+        },
+        set : function (name, value) {
+            return getset(name, value);
+        },
+        store : {},
+    };
     
     return Chainsaw(function builder (saw) {
         var self = this;
@@ -138,6 +135,11 @@ module.exports = function (bufOrEm, eventName) {
         
         self.tap = function (cb) {
             saw.nest(cb, vars.store);
+        };
+        
+        self.flush = function () {
+            vars.store = {};
+            saw.next();
         };
         
         self.loop = function loop (cb) {

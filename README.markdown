@@ -114,6 +114,11 @@ To run the tests with [expresso](http://github.com/visionmedia/expresso):
 
     expresso
 
+flush()
+-------
+
+Clear the variable stash entirely.
+
 Notes
 =====
 
