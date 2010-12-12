@@ -64,7 +64,7 @@ Binary(emitter, eventName='data')
 Start a new chain parser for an `EventEmitter` for an event name `eventName`,
 which defaults to `'data'`.
 
-word{8,16,32,64}{l,b}{e,u,s}(name)
+word{8,16,32,64}{l,b}{e,u,s}(key)
 ----------------------------------
 
 Parse bytes in the buffer or stream given:
@@ -76,14 +76,19 @@ Parse bytes in the buffer or stream given:
 These functions won't start parsing until all previous parser functions have run
 and the data is available.
 
-The result of the parse goes into the variable stash at `name`.
+The result of the parse goes into the variable stash at `key`.
+If `key` has dots (`.`s), it refers to a nested address. If parent container
+values don't exist they will be created automatically, so for instance you can
+assign into `dst.addr` and `dst.port` and the `dst` key in the variable stash
+will be `{ addr : x, port : y }` afterwards.
 
 buffer(key, size)
 -----------------
 
 Take `size` bytes directly off the buffer stream, putting the resulting buffer
 slice in the variable stash at `key`. If `size` is a string, use the value at
-`vars[size]`.
+`vars[size]`. The key follows the same dotted address rules as the word
+functions.
 
 tap(cb)
 -------
