@@ -355,7 +355,7 @@ exports.loop = function (assert) {
     var times = 0;
     var to = setTimeout(function () {
         assert.fail('loop never terminated');
-    }, 100);
+    }, 500);
     
     Binary(em)
         .loop(function (end) {

@@ -148,7 +148,7 @@ module.exports = function (bufOrEm, eventName) {
             var end = false;
             s.on('end', function () {
                 if (end) saw.next();
-                else loop(cb)
+                else self.loop(cb);
             });
             
             var r = builder.call(s.handlers, s);

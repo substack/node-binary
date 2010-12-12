@@ -1,6 +1,6 @@
 {
     "name" : "binary",
-    "version" : "0.0.6",
+    "version" : "0.0.7",
     "description" : "Unpack multibyte binary values from buffers",
     "modules" : {
         "index" : "./index.js",
@@ -23,7 +23,7 @@
         "url" : "http://substack.net"
     },
     "dependencies" : {
-        "chainsaw" : ">0.0.3"
+        "chainsaw" : ">=0.0.4"
     },
     "license" : "MIT/X11",
     "engine" : ["node >=0.2.0"]
