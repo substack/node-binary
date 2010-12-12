@@ -73,7 +73,34 @@ module.exports = function (bufOrEm, eventName) {
         }
     }
     
-    var vars = {};
+    var vars = (function () {
+        var store = {};
+        function getset (name, value) {
+            var node = store;
+            var keys = name.split('.');
+            keys.slice(0,-1).forEach(function (k) {
+                if (node[k] === undefined) node[k] = {};
+                node = node[k]
+            });
+            var key = keys[keys.length - 1];
+            if (arguments.length == 1) {
+                return node[key];
+            }
+            else {
+                return node[key] = value;
+            }
+        }
+        
+        return {
+            get : function (name) {
+                return getset(name);
+            },
+            set : function (name, value) {
+                return getset(name, value);
+            },
+            store : store,
+        };
+    })();
     
     return Chainsaw(function builder (saw) {
         var self = this;
@@ -84,16 +111,7 @@ module.exports = function (bufOrEm, eventName) {
             function decode (cb) {
                 return function (name) {
                     getBytes(bytes, function (buf) {
-                        
-                        var node = vars;
-                        var keys = name.split('.');
-                        keys.slice(0,-1).forEach(function (k) {
-                            if (node[k] === undefined) node[k] = {};
-                            node = node[k]
-                        });
-                        var key = keys[keys.length - 1];
-                        
-                        node[key] = cb(buf);
+                        vars.set(name, cb(buf));
                         saw.next();
                     });
                 };
@@ -119,7 +137,7 @@ module.exports = function (bufOrEm, eventName) {
         self.word8s = self.word8bs;
         
         self.tap = function (cb) {
-            saw.nest(cb, vars);
+            saw.nest(cb, vars.store);
         };
         
         self.loop = function loop (cb) {
@@ -134,16 +152,16 @@ module.exports = function (bufOrEm, eventName) {
             var r = builder.call(s.handlers, s);
             if (r !== undefined) s.handlers = r;
             
-            cb.call(s.chain(), function () { end = true }, vars);
+            cb.call(s.chain(), function () { end = true }, vars.store);
         };
         
         self.buffer = function (name, size) {
             if (typeof size === 'string') {
-                size = vars[size];
+                size = vars.get(size);
             }
             
             getBytes(size, function (buf) {
-                vars[name] = buf;
+                vars.set(name, buf);
                 saw.next();
             });
         };
