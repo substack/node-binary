@@ -84,7 +84,16 @@ module.exports = function (bufOrEm, eventName) {
             function decode (cb) {
                 return function (name) {
                     getBytes(bytes, function (buf) {
-                        vars[name] = cb(buf);
+                        
+                        var node = vars;
+                        var keys = name.split('.');
+                        keys.slice(0,-1).forEach(function (k) {
+                            if (node[k] === undefined) node[k] = {};
+                            node = node[k]
+                        });
+                        var key = keys[keys.length - 1];
+                        
+                        node[key] = cb(buf);
                         saw.next();
                     });
                 };
