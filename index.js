@@ -2,6 +2,7 @@ var Chainsaw = require('chainsaw');
 var EventEmitter = require('events').EventEmitter;
 var Buf = require('./lib/buf.js');
 var Vars = require('./lib/vars.js');
+var Put = require('put');
 
 exports = module.exports = function (bufOrEm, eventName) {
     if (Buffer.isBuffer(bufOrEm)) {
@@ -11,6 +12,8 @@ exports = module.exports = function (bufOrEm, eventName) {
         return exports.stream(bufOrEm, eventName);
     }
 };
+
+exports.build = Put();
 
 exports.stream = function (em, eventName) {
     if (eventName === undefined) eventName = 'data';

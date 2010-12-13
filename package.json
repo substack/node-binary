@@ -24,6 +24,7 @@
     },
     "dependencies" : {
         "chainsaw" : ">=0.0.4",
+        "put" : ">=0.0.1"
     },
     "license" : "MIT/X11",
     "engine" : ["node >=0.2.0"]
