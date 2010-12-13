@@ -147,19 +147,19 @@ module.exports = function (bufOrEm, eventName) {
     });
 };
 
-module.exports.parse = function (buf) {
-    var self = { vars : {} };
+module.exports.parse = function (buffer) {
+    var offset = 0;
+    var vars = Vars();
+    var self = { vars : vars.store };
     
     [ 1, 2, 4, 8 ].forEach(function (bytes) {
         var bits = bytes * 8;
         
         function decode (cb) {
             return function (name) {
-                vars.set
-                getBytes(bytes, function (buf) {
-                    vars.set(name, cb(buf));
-                    saw.next();
-                });
+                var buf = buffer.slice(offset, offset + bytes);
+                offset += bytes;
+                vars.set(name, cb(buf));
                 return self;
             };
         }
@@ -184,8 +184,11 @@ module.exports.parse = function (buf) {
     self.word8s = self.word8bs;
     
     self.tap = function (cb) {
-        saw.nest(cb, vars.store);
+        cb.call(self, vars.store);
+        return self;
     };
+    
+    return self;
 };
 
 // convert byte strings to unsigned little endian numbers
