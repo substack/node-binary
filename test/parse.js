@@ -20,7 +20,11 @@ exports.parse = function (assert) {
         })
         .vars
     ;
-    assert.eql(res, { a : 97, bc : 25187 });
+    assert.eql(res, {
+        a : 97,
+        bc : 25187,
+        def : new Buffer([ 1, 2, 3 ]),
+    });
 };
 
 exports.loop = function (assert) {

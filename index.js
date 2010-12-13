@@ -188,12 +188,23 @@ module.exports.parse = function parse (buffer) {
         return self;
     };
     
-    self.loop = function loop (cb) {
+    self.loop = function (cb) {
         var end = false;
         var ender = function () { end = true };
         while (end === false) {
             cb.call(self, ender, vars.store);
         }
+        return self;
+    };
+    
+    self.buffer = function (name, size) {
+        if (typeof size === 'string') {
+            size = vars.get(size);
+        }
+        var buf = buffer.slice(offset, offset + size);
+        offset += size;
+        vars.set(name, buf);
+        
         return self;
     };
     
