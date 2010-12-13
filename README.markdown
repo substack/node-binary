@@ -103,6 +103,12 @@ Loop, each time calling `cb(end, vars)` for function `end` and the variable
 stash with `this` set to a new chain for nested parsing. The loop terminates
 once `end` is called.
 
+Binary.parse(buf)
+-----------------
+
+Like `Binary(buf)`, but synchronous so you can parse fields in a single pass.
+Terminate a chain with `.vars` to get at the result of the parse.
+
 Installation
 ============
 
