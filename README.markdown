@@ -33,7 +33,7 @@ stream.js
     var Binary = require('binary');
     var stdin = process.openStdin();
     
-    Binary(stdin)
+    Binary.stream(stdin)
         .word32lu('x')
         .word16bs('y')
         .word16bu('z')
