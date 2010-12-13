@@ -77,38 +77,14 @@ module.exports = function (bufOrEm, eventName) {
     var vars = Vars();
     
     return Chainsaw(function builder (saw) {
-        var self = this;
-        
-        [ 1, 2, 4, 8 ].forEach(function (bytes) {
-            var bits = bytes * 8;
-            
-            function decode (cb) {
-                return function (name) {
-                    getBytes(bytes, function (buf) {
-                        vars.set(name, cb(buf));
-                        saw.next();
-                    });
-                };
-            }
-            
-            self['word' + bits + 'le']
-            = self['word' + bits + 'lu']
-            = decode(decodeLEu);
-            
-            self['word' + bits + 'ls']
-            = decode(decodeLEs);
-            
-            self['word' + bits + 'be']
-            = self['word' + bits + 'bu']
-            = decode(decodeBEu);
-            
-            self['word' + bits + 'bs']
-            = decode(decodeBEs);
+        var self = words(function (bytes, cb) {
+            return function (name) {
+                getBytes(bytes, function (buf) {
+                    vars.set(name, cb(buf));
+                    saw.next();
+                });
+            };
         });
-        
-        // word8be(n) == word8le(n) for all n
-        self.word8 = self.word8u = self.word8be;
-        self.word8s = self.word8bs;
         
         self.tap = function (cb) {
             saw.nest(cb, vars.store);
@@ -144,44 +120,24 @@ module.exports = function (bufOrEm, eventName) {
                 saw.next();
             });
         };
+        
+        return self;
     });
 };
 
 module.exports.parse = function parse (buffer) {
-    var offset = 0;
-    var vars = Vars();
-    var self = { vars : vars.store };
-    
-    [ 1, 2, 4, 8 ].forEach(function (bytes) {
-        var bits = bytes * 8;
-        
-        function decode (cb) {
-            return function (name) {
-                var buf = buffer.slice(offset, offset + bytes);
-                offset += bytes;
-                vars.set(name, cb(buf));
-                return self;
-            };
-        }
-        
-        self['word' + bits + 'le']
-        = self['word' + bits + 'lu']
-        = decode(decodeLEu);
-        
-        self['word' + bits + 'ls']
-        = decode(decodeLEs);
-        
-        self['word' + bits + 'be']
-        = self['word' + bits + 'bu']
-        = decode(decodeBEu);
-        
-        self['word' + bits + 'bs']
-        = decode(decodeBEs);
+    var self = words(function (bytes, cb) {
+        return function (name) {
+            var buf = buffer.slice(offset, offset + bytes);
+            offset += bytes;
+            vars.set(name, cb(buf));
+            return self;
+        };
     });
     
-    // word8be(n) == word8le(n) for all n
-    self.word8 = self.word8u = self.word8be;
-    self.word8s = self.word8bs;
+    var offset = 0;
+    var vars = Vars();
+    self.vars = vars.store;
     
     self.tap = function (cb) {
         cb.call(self, vars.store);
@@ -245,4 +201,32 @@ function decodeLEs (bytes) {
         val -= Math.pow(256, bytes.length);
     }
     return val;
+}
+
+function words (decode) {
+    var self = {};
+    
+    [ 1, 2, 4, 8 ].forEach(function (bytes) {
+        var bits = bytes * 8;
+        
+        self['word' + bits + 'le']
+        = self['word' + bits + 'lu']
+        = decode(bytes, decodeLEu);
+        
+        self['word' + bits + 'ls']
+        = decode(bytes, decodeLEs);
+        
+        self['word' + bits + 'be']
+        = self['word' + bits + 'bu']
+        = decode(bytes, decodeBEu);
+        
+        self['word' + bits + 'bs']
+        = decode(bytes, decodeBEs);
+    });
+    
+    // word8be(n) == word8le(n) for all n
+    self.word8 = self.word8u = self.word8be;
+    self.word8s = self.word8bs;
+    
+    return self;
 }
