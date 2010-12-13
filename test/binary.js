@@ -6,7 +6,7 @@ exports.fromBuffer = function (assert) {
         assert.fail('never tapped');
     }, 50);
     
-    Binary(new Buffer([ 97, 98, 99 ]))
+    Binary.parse(new Buffer([ 97, 98, 99 ]))
         .word8('a')
         .word16be('bc')
         .tap(function (vars) {
@@ -21,7 +21,7 @@ exports.dots = function (assert) {
         assert.fail('never tapped');
     }, 50);
     
-    Binary(new Buffer([ 97, 98, 99, 100, 101, 102 ]))
+    Binary.parse(new Buffer([ 97, 98, 99, 100, 101, 102 ]))
         .word8('a')
         .word16be('b.x')
         .word16be('b.y')
@@ -45,7 +45,7 @@ exports.flush = function (assert) {
         assert.fail('never tapped');
     }, 50);
     
-    Binary(new Buffer([ 97, 98, 99, 100, 101, 102 ]))
+    Binary.parse(new Buffer([ 97, 98, 99, 100, 101, 102 ]))
         .word8('a')
         .word16be('b')
         .word16be('c')
@@ -64,7 +64,7 @@ exports.immediate = function (assert) {
     }, 50);
     
     var em = new EventEmitter;
-    Binary(em, 'moo')
+    Binary.stream(em, 'moo')
         .word8('a')
         .word16be('bc')
         .tap(function (vars) {
@@ -82,7 +82,7 @@ exports.deferred = function (assert) {
     }, 50);
     
     var em = new EventEmitter;
-    Binary(em)
+    Binary.stream(em)
         .word8('a')
         .word16be('bc')
         .tap(function (vars) {
@@ -102,7 +102,7 @@ exports.split = function (assert) {
     }, 50);
     
     var em = new EventEmitter;
-    Binary(em)
+    Binary.stream(em)
         .word8('a')
         .word16be('bc')
         .word32ls('x')
@@ -144,7 +144,7 @@ exports.posls = function (assert) {
         193, 203, 33, 239, 52, 1, 45, 0, // d == 12667700813876161
     ]);
     
-    Binary(buf)
+    Binary.parse(buf)
         .word8ls('a')
         .word16ls('b')
         .word32ls('c')
@@ -175,7 +175,7 @@ exports.negls = function (assert) {
         63, 52, 222, 16, 203, 254, 210, 255, // d == -12667700813876161
     ]);
     
-    Binary(buf)
+    Binary.parse(buf)
         .word8ls('a')
         .word16ls('b')
         .word32ls('c')
@@ -206,7 +206,7 @@ exports.posbs = function (assert) {
         0, 45, 1, 52, 239, 33, 203, 193, // d == 12667700813876161
     ]);
     
-    Binary(buf)
+    Binary.parse(buf)
         .word8bs('a')
         .word16bs('b')
         .word32bs('c')
@@ -237,7 +237,7 @@ exports.negbs = function (assert) {
         255, 210, 254, 203, 16, 222, 52, 63, // d == -12667700813876161
     ]);
     
-    Binary(buf)
+    Binary.parse(buf)
         .word8bs('a')
         .word16bs('b')
         .word32bs('c')
@@ -268,7 +268,7 @@ exports.lu = function (assert) {
         193, 203, 115, 155, 20, 180, 81, 29, // d == 2112667700813876161
     ]);
     
-    Binary(buf)
+    Binary.parse(buf)
         .word8lu('a')
         .word16lu('b')
         .word32lu('c')
@@ -285,7 +285,7 @@ exports.lu = function (assert) {
     ;
     
     // also check aliases here:
-    Binary(buf)
+    Binary.parse(buf)
         .word8le('a')
         .word16le('b')
         .word32le('c')
@@ -316,7 +316,7 @@ exports.bu = function (assert) {
         29, 81, 180, 20, 155, 115, 203, 193, // d == 2112667700813876161
     ]);
     
-    Binary(buf)
+    Binary.parse(buf)
         .word8bu('a')
         .word16bu('b')
         .word32bu('c')
@@ -333,7 +333,7 @@ exports.bu = function (assert) {
     ;
     
     // also check aliases here:
-    Binary(buf)
+    Binary.parse(buf)
         .word8be('a')
         .word16be('b')
         .word32be('c')
@@ -357,7 +357,7 @@ exports.loop = function (assert) {
         assert.fail('loop never terminated');
     }, 500);
     
-    Binary(em)
+    Binary.stream(em)
         .loop(function (end) {
             this
                 .word16lu('a')
@@ -404,7 +404,7 @@ exports.getBuffer = function (assert) {
     }, 20);
     
     var buf = new Buffer([ 4, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ]);
-    Binary(buf)
+    Binary.parse(buf)
         .word8('a')
         .buffer('b', 7)
         .word16lu('c')
@@ -442,7 +442,7 @@ exports.interval = function (assert) {
     }, 1);
     
     var loops = 0;
-    Binary(em)
+    Binary.stream(em)
         .loop(function (end) {
             this
             .word8('x')

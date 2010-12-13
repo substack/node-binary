@@ -3,17 +3,8 @@ var EventEmitter = require('events').EventEmitter;
 var Buf = require('./lib/buf.js');
 var Vars = require('./lib/vars.js');
 
-module.exports = function (bufOrEm, eventName) {
+exports.stream = function (em, eventName) {
     if (eventName === undefined) eventName = 'data';
-    
-    var em = bufOrEm instanceof EventEmitter
-        ? bufOrEm : new EventEmitter;
-    
-    if (bufOrEm instanceof Buffer) {
-        process.nextTick(function () {
-            em.emit(eventName, bufOrEm);
-        });
-    }
     
     var pending = null;
     function getBytes (bytes, cb) {
@@ -125,7 +116,7 @@ module.exports = function (bufOrEm, eventName) {
     });
 };
 
-module.exports.parse = function parse (buffer) {
+exports.parse = function parse (buffer) {
     var self = words(function (bytes, cb) {
         return function (name) {
             var buf = buffer.slice(offset, offset + bytes);
@@ -161,6 +152,11 @@ module.exports.parse = function parse (buffer) {
         offset += size;
         vars.set(name, buf);
         
+        return self;
+    };
+    
+    self.flush = function () {
+        vars.store = {};
         return self;
     };
     
