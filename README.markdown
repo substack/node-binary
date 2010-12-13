@@ -69,6 +69,11 @@ Binary(bufOrEm, eventName)
 If `bufOrEm` is a Buffer, returns `Binary.parse(bufOrEm)`, else returns
 `Binary.stream(bufOrEm, eventName)`
 
+Binary.put()
+------------
+
+Returns a new [put object](http://github.com/substack/node-put).
+
 word{8,16,32,64}{l,b}{e,u,s}(key)
 ----------------------------------
 
