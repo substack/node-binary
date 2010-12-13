@@ -4,29 +4,12 @@ Binary
 Unpack multibyte binary values from buffers and streams.
 You can specify the endianness and signedness of the fields to be unpacked too.
 
-This module is a cleaner, faster, and more complete version of
+This module is a cleaner and more complete version of
 [bufferlist](https://github.com/substack/node-bufferlist)'s binary module that
 runs on pre-allocated buffers instead of a linked list.
 
 Examples
 ========
-
-buf.js
-------
-    var buf = new Buffer([ 97, 98, 99, 100, 101, 102, 0 ]);
-
-    var Binary = require('binary');
-    Binary(buf)
-        .word16ls('ab')
-        .word32bu('cf')
-        .word8('x')
-        .tap(function (vars) {
-            console.dir(vars);
-        })
-    ;
--
-    $ node buf.js
-    { ab: 25185, cf: 1667523942, x: 0 }
 
 parse.js
 --------
@@ -67,18 +50,24 @@ stream.js
 Methods
 =======
 
-Binary(buf)
------------
+Binary.parse(buf)
+-----------------
 
-Start a new chain parser for a `Buffer`.
+Parse a static buffer in one pass. Returns a chainable interface with the
+methods below plus a `vars` field to get at the variable stash as the last item
+in a chain.
 
-Binary(emitter)
----------------
-Binary(emitter, eventName='data')
----------------------------------
+Binary.stream(emitter, eventName='data')
+----------------------------------------
 
-Start a new chain parser for an `EventEmitter` for an event name `eventName`,
-which defaults to `'data'`.
+Parse a stream of buffer events from `eventName`. Each action will only execute
+once enough data has arrived from the event emitter.
+
+Binary(bufOrEm, eventName)
+--------------------------
+
+If `bufOrEm` is a Buffer, returns `Binary.parse(bufOrEm)`, else returns
+`Binary.stream(bufOrEm, eventName)`
 
 word{8,16,32,64}{l,b}{e,u,s}(key)
 ----------------------------------
@@ -119,11 +108,10 @@ Loop, each time calling `cb(end, vars)` for function `end` and the variable
 stash with `this` set to a new chain for nested parsing. The loop terminates
 once `end` is called.
 
-Binary.parse(buf)
------------------
+flush()
+-------
 
-Like `Binary(buf)`, but synchronous so you can parse fields in a single pass.
-Terminate a chain with `.vars` to get at the result of the parse.
+Clear the variable stash entirely.
 
 Installation
 ============
@@ -136,19 +124,8 @@ To run the tests with [expresso](http://github.com/visionmedia/expresso):
 
     expresso
 
-flush()
--------
-
-Clear the variable stash entirely.
-
 Notes
 =====
 
 The word64 functions will only return approximations since javascript uses ieee
 floating point for all number types. Mind the loss of precision.
-
-Todo
-====
-
-* Actually verify that this approach is faster than bufferlist/binary.
-* Add all the nifty nested parser functions without sacrificing performance.

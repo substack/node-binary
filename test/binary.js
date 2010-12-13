@@ -6,7 +6,7 @@ exports.fromBuffer = function (assert) {
         assert.fail('never tapped');
     }, 50);
     
-    Binary.parse(new Buffer([ 97, 98, 99 ]))
+    Binary(new Buffer([ 97, 98, 99 ]))
         .word8('a')
         .word16be('bc')
         .tap(function (vars) {
@@ -442,7 +442,7 @@ exports.interval = function (assert) {
     }, 1);
     
     var loops = 0;
-    Binary.stream(em)
+    Binary(em)
         .loop(function (end) {
             this
             .word8('x')

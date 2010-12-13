@@ -3,6 +3,15 @@ var EventEmitter = require('events').EventEmitter;
 var Buf = require('./lib/buf.js');
 var Vars = require('./lib/vars.js');
 
+exports = module.exports = function (bufOrEm, eventName) {
+    if (Buffer.isBuffer(bufOrEm)) {
+        return exports.parse(bufOrEm);
+    }
+    else {
+        return exports.stream(bufOrEm, eventName);
+    }
+};
+
 exports.stream = function (em, eventName) {
     if (eventName === undefined) eventName = 'data';
     
