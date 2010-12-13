@@ -15,6 +15,16 @@ function binary (buf, cb) {
     ;
 };
 
+function parse (buf, cb) {
+    cb(Bin.parse(buf)
+        .word32le('x')
+        .word16be('y')
+        .word16be('z')
+        .word32le('w')
+        .vars
+    );
+};
+
 function bufferlist (buf, cb) {
     var blist = new BufferList;
     blist.push(buf);
@@ -35,7 +45,7 @@ for (var i = 0; i < 200; i++) {
 }
 
 console.log('small');
-Seq(binary, bufferlist)
+Seq(binary, parse, bufferlist)
     .seqEach(function (f) {
         var t = this;
         var t0 = Date.now();
