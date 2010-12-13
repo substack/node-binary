@@ -1,6 +1,7 @@
 var Chainsaw = require('chainsaw');
 var EventEmitter = require('events').EventEmitter;
 var Buf = require('./lib/buf.js');
+var Vars = require('./lib/vars.js');
 
 module.exports = function (bufOrEm, eventName) {
     if (eventName === undefined) eventName = 'data';
@@ -73,31 +74,7 @@ module.exports = function (bufOrEm, eventName) {
         }
     }
     
-    function getset (name, value) {
-        var node = vars.store;
-        var keys = name.split('.');
-        keys.slice(0,-1).forEach(function (k) {
-            if (node[k] === undefined) node[k] = {};
-            node = node[k]
-        });
-        var key = keys[keys.length - 1];
-        if (arguments.length == 1) {
-            return node[key];
-        }
-        else {
-            return node[key] = value;
-        }
-    }
-    
-    var vars = {
-        get : function (name) {
-            return getset(name);
-        },
-        set : function (name, value) {
-            return getset(name, value);
-        },
-        store : {},
-    };
+    var vars = Vars();
     
     return Chainsaw(function builder (saw) {
         var self = this;
@@ -168,6 +145,47 @@ module.exports = function (bufOrEm, eventName) {
             });
         };
     });
+};
+
+module.exports.parse = function (buf) {
+    var self = { vars : {} };
+    
+    [ 1, 2, 4, 8 ].forEach(function (bytes) {
+        var bits = bytes * 8;
+        
+        function decode (cb) {
+            return function (name) {
+                vars.set
+                getBytes(bytes, function (buf) {
+                    vars.set(name, cb(buf));
+                    saw.next();
+                });
+                return self;
+            };
+        }
+        
+        self['word' + bits + 'le']
+        = self['word' + bits + 'lu']
+        = decode(decodeLEu);
+        
+        self['word' + bits + 'ls']
+        = decode(decodeLEs);
+        
+        self['word' + bits + 'be']
+        = self['word' + bits + 'bu']
+        = decode(decodeBEu);
+        
+        self['word' + bits + 'bs']
+        = decode(decodeBEs);
+    });
+    
+    // word8be(n) == word8le(n) for all n
+    self.word8 = self.word8u = self.word8be;
+    self.word8s = self.word8bs;
+    
+    self.tap = function (cb) {
+        saw.nest(cb, vars.store);
+    };
 };
 
 // convert byte strings to unsigned little endian numbers
