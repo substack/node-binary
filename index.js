@@ -147,8 +147,8 @@ module.exports = function (bufOrEm, eventName) {
     });
 };
 
-module.exports.parse = function parse (buffer, offset) {
-    if (offset === undefined) offset = 0;
+module.exports.parse = function parse (buffer) {
+    var offset = 0;
     var vars = Vars();
     var self = { vars : vars.store };
     
@@ -184,7 +184,16 @@ module.exports.parse = function parse (buffer, offset) {
     self.word8s = self.word8bs;
     
     self.tap = function (cb) {
-        cb.call(parse(buffer, offset), vars.store);
+        cb.call(self, vars.store);
+        return self;
+    };
+    
+    self.loop = function loop (cb) {
+        var end = false;
+        var ender = function () { end = true };
+        while (end === false) {
+            cb.call(self, ender, vars.store);
+        }
         return self;
     };
     

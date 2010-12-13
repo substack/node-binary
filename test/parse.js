@@ -27,7 +27,7 @@ exports.loop = function (assert) {
         .word8('a')
         .word16be('bc')
         .loop(function (end) {
-            var x = this.word8('x').vars.x;
+            var x = this.word8s('x').vars.x;
             if (x < 0) end();
         })
         .tap(function (vars) {
