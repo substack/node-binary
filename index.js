@@ -79,14 +79,20 @@ exports.stream = function (em, eventName) {
     var vars = Vars();
     
     return Chainsaw(function builder (saw) {
+        var done = false;
+        stream.on('end', function () { done = true });
+        function next () { if (!done) saw.next() }
+        
         var self = words(function (bytes, cb) {
             return function (name) {
                 getBytes(bytes, function (buf) {
                     vars.set(name, cb(buf));
-                    saw.next();
+                    next();
                 });
             };
         });
+        
+        
         
         self.tap = function (cb) {
             saw.nest(cb, vars.store);
@@ -94,7 +100,7 @@ exports.stream = function (em, eventName) {
         
         self.flush = function () {
             vars.store = {};
-            saw.next();
+            next();
         };
         
         self.loop = function loop (cb) {
@@ -102,7 +108,7 @@ exports.stream = function (em, eventName) {
             
             var end = false;
             s.on('end', function () {
-                if (end) saw.next();
+                if (end) next();
                 else self.loop(cb);
             });
             
@@ -119,7 +125,7 @@ exports.stream = function (em, eventName) {
             
             getBytes(size, function (buf) {
                 vars.set(name, buf);
-                saw.next();
+                next();
             });
         };
         
