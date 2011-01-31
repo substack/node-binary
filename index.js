@@ -18,10 +18,11 @@ exports.stream = function (em, eventName) {
     if (eventName === undefined) eventName = 'data';
     
     var pending = null;
-    function getBytes (bytes, cb) {
+    function getBytes (bytes, cb, skip) {
         pending = {
             bytes : bytes,
             size : bytes,
+            skip : skip,
             cb : function (buf) {
                 pending = null;
                 cb(buf);
@@ -47,7 +48,10 @@ exports.stream = function (em, eventName) {
             var buf = active.slice();
             active = null;
             
-            if (pending.buffer) {
+            if (pending.skip) {
+                pending.cb();
+            }
+            else if (pending.buffer) {
                 buf.copy(pending.buffer, rem, 0);
                 pending.cb(pending.buffer);
             }
@@ -58,7 +62,10 @@ exports.stream = function (em, eventName) {
         else if (asize > pending.bytes) {
             var buf = active.slice(0, pending.bytes);
             active.seek(pending.bytes);
-            if (pending.buffer) {
+            if (pending.skip) {
+                pending.cb();
+            }
+            else if (pending.buffer) {
                 buf.copy(pending.buffer, rem, 0, pending.bytes);
                 pending.cb(pending.buffer);
             }
@@ -67,10 +74,12 @@ exports.stream = function (em, eventName) {
             }
         }
         else if (asize < pending.bytes) {
-            if (!pending.buffer) {
-                pending.buffer = new Buffer(pending.size);
+            if (!pending.skip) {
+                if (!pending.buffer) {
+                    pending.buffer = new Buffer(pending.size);
+                }
+                active.slice().copy(pending.buffer, rem, 0);
             }
-            active.slice().copy(pending.buffer, rem, 0);
             pending.bytes -= asize;
             active = null;
         }
