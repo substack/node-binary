@@ -29,7 +29,7 @@ exports.stream = function (em, eventName) {
         };
         dispatch();
     }
-     
+    
     var active = null;
     em.on(eventName, function (buf) {
         active = Buf(buf);
@@ -78,10 +78,11 @@ exports.stream = function (em, eventName) {
     
     var vars = Vars();
     
+    var done = false;
+    em.on('end', function () { done = true });
+    
     return Chainsaw(function builder (saw) {
-        var done = false;
-        stream.on('end', function () { done = true });
-        function next () { if (!done) saw.next() }
+        function next () { if (!done[0]) saw.next() }
         
         var self = words(function (bytes, cb) {
             return function (name) {
@@ -91,8 +92,6 @@ exports.stream = function (em, eventName) {
                 });
             };
         });
-        
-        
         
         self.tap = function (cb) {
             saw.nest(cb, vars.store);

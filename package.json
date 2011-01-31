@@ -2,9 +2,7 @@
     "name" : "binary",
     "version" : "0.1.0",
     "description" : "Unpack multibyte binary values from buffers",
-    "modules" : {
-        "index" : "./index.js",
-    },
+    "main" : "./index.js",
     "repository" : {
         "type" : "git",
         "url" : "http://github.com/substack/node-binary.git"
