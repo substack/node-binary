@@ -1,5 +1,6 @@
 var Binary = require('binary');
 var EventEmitter = require('events').EventEmitter;
+var Seq = require('seq');
 
 exports.fromBuffer = function (assert) {
     var to = setTimeout(function () {
@@ -458,6 +459,64 @@ exports.interval = function (assert) {
         .tap(function () {
             clearTimeout(to);
             assert.eql(loops, 1000);
+        })
+    ;
+};
+
+exports.skip = function (assert) {
+    var to = setTimeout(function () {
+        assert.fail('Never finished');
+    }, 1000);
+    
+    var em = new EventEmitter;
+    var state = 0;
+    
+    Binary(em)
+        .word16lu('a')
+        .tap(function () { state = 1 })
+        .skip(7)
+        .tap(function () { state = 2 })
+        .word8('b')
+        .tap(function () { state = 3 })
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(state, 3);
+            assert.eql(vars, {
+                a : 2569,
+                b : 8,
+            });
+        })
+    ;
+    
+    Seq()
+        .seq(setTimeout, Seq, 20)
+        .seq(function () {
+            assert.eql(state, 0);
+            em.emit('data', new Buffer([ 9 ]));
+            this(null);
+        })
+        .seq(setTimeout, Seq, 5)
+        .seq(function () {
+            assert.eql(state, 0);
+            em.emit('data', new Buffer([ 10, 1, 2 ]));
+            this(null);
+        })
+        .seq(setTimeout, Seq, 30)
+        .seq(function () {
+            assert.eql(state, 1);
+            em.emit('data', new Buffer([ 3, 4, 5 ]));
+            this(null);
+        })
+        .seq(setTimeout, Seq, 15)
+        .seq(function () {
+            assert.eql(state, 1);
+            em.emit('data', new Buffer([ 6, 7 ]));
+            this(null);
+        })
+        .seq(function () {
+            assert.eql(state, 2);
+            em.emit('data', new Buffer([ 8 ]));
+            this(null);
         })
     ;
 };
