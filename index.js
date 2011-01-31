@@ -126,13 +126,23 @@ exports.stream = function (em, eventName) {
             cb.call(s.chain(), function () { end = true }, vars.store);
         };
         
-        self.buffer = function (name, size) {
-            if (typeof size === 'string') {
-                size = vars.get(size);
+        self.buffer = function (name, bytes) {
+            if (typeof bytes === 'string') {
+                bytes = vars.get(bytes);
             }
             
-            getBytes(size, function (buf) {
+            getBytes(bytes, function (buf) {
                 vars.set(name, buf);
+                next();
+            });
+        };
+        
+        self.skip = function (bytes) {
+            if (typeof bytes === 'string') {
+                bytes = vars.get(bytes);
+            }
+            
+            getBytes(bytes, function () {
                 next();
             });
         };
