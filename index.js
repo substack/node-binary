@@ -33,6 +33,7 @@ exports.stream = function (em, eventName) {
     
     var active = null;
     em.on(eventName, function (buf) {
+        while (active) dispatch();
         active = Buf(buf);
         dispatch();
     });
@@ -62,6 +63,7 @@ exports.stream = function (em, eventName) {
         else if (asize > pending.bytes) {
             var buf = active.slice(0, pending.bytes);
             active.seek(pending.bytes);
+            
             if (pending.skip) {
                 pending.cb();
             }
@@ -112,18 +114,21 @@ exports.stream = function (em, eventName) {
         };
         
         self.loop = function loop (cb) {
-            var s = Chainsaw.saw(builder, {});
-            
             var end = false;
+            
+            var s = Chainsaw.saw(builder, {});
             s.on('end', function () {
-                if (end) next();
-                else self.loop(cb);
+                if (!end) self.loop(cb)
             });
             
             var r = builder.call(s.handlers, s);
             if (r !== undefined) s.handlers = r;
             
-            cb.call(s.chain(), function () { end = true }, vars.store);
+            var ch = s.chain();
+            cb.call(ch, function () {
+                end = true;
+                next();
+            }, vars.store);
         };
         
         self.buffer = function (name, bytes) {
