@@ -147,6 +147,27 @@ exports.stream = function (em, eventName) {
             });
         };
         
+        var findLast = null;
+        self.find = function find (search, cb) {
+            if (findLast === null) {
+                getBytes(search.length, function (buf) {
+                    for (
+                        var i = 0;
+                        i < search.length && search[i] === buf[i];
+                        i++
+                    );
+                    if (i === search.length) {
+                        if (cb) cb(new Buffer([]))
+                    }
+                });
+            }
+            else {
+                for (var i = findLast.length; until[i] === buf[i]; i--);
+                var span = findLast.length - i;
+                console.log(span);
+            }
+        };
+        
         return self;
     });
 };
