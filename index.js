@@ -1,6 +1,6 @@
 var Chainsaw = require('chainsaw');
 var EventEmitter = require('events').EventEmitter;
-var Buf = require('./lib/buf.js');
+var Buffers = require('./lib/buffers.js');
 var Vars = require('./lib/vars.js');
 
 exports = module.exports = function (bufOrEm, eventName) {
@@ -21,69 +21,33 @@ exports.stream = function (em, eventName) {
     function getBytes (bytes, cb, skip) {
         pending = {
             bytes : bytes,
-            size : bytes,
             skip : skip,
             cb : function (buf) {
                 pending = null;
                 cb(buf);
-            }
+            },
         };
         dispatch();
     }
     
-    var active = null;
+    var buffers = Buffers();
     em.on(eventName, function (buf) {
-        while (active) dispatch();
-        active = Buf(buf);
+        buffers.push(buf);
         dispatch();
     });
     
     function dispatch () {
-        if (!active) return;
         if (!pending) return;
+        var bytes = pending.bytes;
         
-        var asize = active.size();
-        var rem = pending.size - pending.bytes;
-        
-        if (asize === pending.bytes) {
-            var buf = active.slice();
-            active = null;
-            
+        if (buffers.ready >= bytes) {
             if (pending.skip) {
                 pending.cb();
             }
-            else if (pending.buffer) {
-                buf.copy(pending.buffer, rem, 0);
-                pending.cb(pending.buffer);
-            }
             else {
-                pending.cb(buf);
+                pending.cb(buffers.slice(0, bytes));
             }
-        }
-        else if (asize > pending.bytes) {
-            var buf = active.slice(0, pending.bytes);
-            active.seek(pending.bytes);
-            
-            if (pending.skip) {
-                pending.cb();
-            }
-            else if (pending.buffer) {
-                buf.copy(pending.buffer, rem, 0, pending.bytes);
-                pending.cb(pending.buffer);
-            }
-            else {
-                pending.cb(buf);
-            }
-        }
-        else if (asize < pending.bytes) {
-            if (!pending.skip) {
-                if (!pending.buffer) {
-                    pending.buffer = new Buffer(pending.size);
-                }
-                active.slice().copy(pending.buffer, rem, 0);
-            }
-            pending.bytes -= asize;
-            active = null;
+            buffers.seek(bytes);
         }
     }
     
