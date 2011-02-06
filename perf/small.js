@@ -4,6 +4,7 @@ var Hash = require('traverse/hash');
 var Bin = require('binary');
 var Buf = require('bufferlist/binary');
 var BufferList = require('bufferlist');
+var EventEmitter = require('events').EventEmitter;
 
 function binary (buf, cb) {
     Bin(buf)
@@ -13,6 +14,18 @@ function binary (buf, cb) {
         .word32le('w')
         .tap(cb)
     ;
+};
+
+function stream (buf, cb) {
+    var em = new EventEmitter;
+    Bin(em)
+        .word32le('x')
+        .word16be('y')
+        .word16be('z')
+        .word32le('w')
+        .tap(cb)
+    ;
+    em.emit('data', buf);
 };
 
 function parse (buf, cb) {
@@ -45,7 +58,7 @@ for (var i = 0; i < 200; i++) {
 }
 
 console.log('small');
-Seq(binary, parse, bufferlist)
+Seq(binary, stream, parse, bufferlist)
     .seqEach(function (f) {
         var t = this;
         var t0 = Date.now();
