@@ -1,6 +1,6 @@
 var Chainsaw = require('chainsaw');
 var EventEmitter = require('events').EventEmitter;
-var Buffers = require('./lib/buffers.js');
+var Buffers = require('buffers');
 var Vars = require('./lib/vars.js');
 
 exports = module.exports = function (bufOrEm, eventName) {
@@ -40,14 +40,14 @@ exports.stream = function (em, eventName) {
         if (!pending) return;
         var bytes = pending.bytes;
         
-        if (buffers.ready >= bytes) {
+        if (buffers.length >= bytes) {
+            var buf = buffers.splice(0, bytes);
             if (pending.skip) {
                 pending.cb();
             }
             else {
-                pending.cb(buffers.slice(0, bytes));
+                pending.cb(buf.slice());
             }
-            buffers.seek(bytes);
         }
     }
     

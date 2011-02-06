@@ -366,14 +366,11 @@ exports.loop = function (assert) {
                 .word8s('c')
                 .tap(function (vars) {
                     times ++;
-console.log('time!');
-console.dir(vars);
                     if (vars.c < 0) end();
                 })
             ;
         })
         .tap(function (vars) {
-console.log('tap!');
             clearTimeout(to);
             assert.eql(vars, { a : 1337, b : 55, c : -5 });
             assert.eql(times, 4);
