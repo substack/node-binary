@@ -1,8 +1,9 @@
 var Binary = require('binary');
 var EventEmitter = require('events').EventEmitter;
 var Seq = require('seq');
+var assert = require('assert');
 
-exports.fromBuffer = function (assert) {
+exports.fromBuffer = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -17,7 +18,7 @@ exports.fromBuffer = function (assert) {
     ;
 };
 
-exports.dots = function (assert) {
+exports.dots = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -41,7 +42,7 @@ exports.dots = function (assert) {
     ;
 };
 
-exports.flush = function (assert) {
+exports.flush = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -59,7 +60,7 @@ exports.flush = function (assert) {
     ;
 };
 
-exports.immediate = function (assert) {
+exports.immediate = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -77,7 +78,7 @@ exports.immediate = function (assert) {
     em.emit('moo', new Buffer([ 97, 98, 99 ]));
 };
 
-exports.deferred = function (assert) {
+exports.deferred = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -97,7 +98,7 @@ exports.deferred = function (assert) {
     }, 10);
 };
 
-exports.split = function (assert) {
+exports.split = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -131,7 +132,7 @@ exports.split = function (assert) {
     }, 40);
 };
 
-exports.posls = function (assert) {
+exports.posls = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -162,7 +163,7 @@ exports.posls = function (assert) {
     ;
 };
 
-exports.negls = function (assert) {
+exports.negls = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -193,7 +194,7 @@ exports.negls = function (assert) {
     ;
 };
 
-exports.posbs = function (assert) {
+exports.posbs = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -224,7 +225,7 @@ exports.posbs = function (assert) {
     ;
 };
 
-exports.negbs = function (assert) {
+exports.negbs = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -255,7 +256,7 @@ exports.negbs = function (assert) {
     ;
 };
 
-exports.lu = function (assert) {
+exports.lu = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -303,7 +304,7 @@ exports.lu = function (assert) {
     ;
 };
 
-exports.bu = function (assert) {
+exports.bu = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -351,7 +352,7 @@ exports.bu = function (assert) {
     ;
 };
 
-exports.loop = function (assert) {
+exports.loop = function () {
     var em = new EventEmitter;
     var times = 0;
     var to = setTimeout(function () {
@@ -395,7 +396,7 @@ exports.loop = function (assert) {
     }, 90);
 };
 
-exports.getBuffer = function (assert) {
+exports.getBuffer = function () {
     var t1 = setTimeout(function () {
         assert.fail('first buffer never finished');
     }, 20);
@@ -425,7 +426,7 @@ exports.getBuffer = function (assert) {
     ;
 };
 
-exports.interval = function (assert) {
+exports.interval = function () {
     var to = setTimeout(function () {
         assert.fail('loop populated by interval never finished');
     }, 5000);
@@ -463,7 +464,7 @@ exports.interval = function (assert) {
     ;
 };
 
-exports.skip = function (assert) {
+exports.skip = function () {
     var to = setTimeout(function () {
         assert.fail('Never finished');
     }, 1000);
@@ -519,4 +520,35 @@ exports.skip = function (assert) {
             this(null);
         })
     ;
+};
+
+exports.scan = function () {
+    var to = setTimeout(function () {
+        assert.fail('Never finished');
+    }, 1000);
+    
+    var em = new EventEmitter;
+    Binary(em)
+        .word8('a')
+        .scan('line', new Buffer('\r\n'))
+        .word8('z')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars.a, 99);
+            assert.eql(vars.line.toString(), 'foo bar');
+            assert.eql(vars.z, 42);
+        })
+    ;
+    
+    setTimeout(function () {
+        em.emit('data', new Buffer([99,0x66,0x6f,0x6f,0x20]));
+    }, 20);
+    
+    setTimeout(function () {
+        em.emit('data', new Buffer('bar\r'));
+    }, 40);
+    
+    setTimeout(function () {
+        em.emit('data', new Buffer('\n*'));
+    }, 60);
 };

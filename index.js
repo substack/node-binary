@@ -38,15 +38,20 @@ exports.stream = function (em, eventName) {
     
     function dispatch () {
         if (!pending) return;
-        var bytes = pending.bytes;
-        
-        if (buffers.length >= bytes) {
-            var buf = buffers.splice(0, bytes);
-            if (pending.skip) {
-                pending.cb();
-            }
-            else {
-                pending.cb(buf.slice());
+        if (typeof pending === 'function') {
+            pending();
+        }
+        else {
+            var bytes = pending.bytes;
+            
+            if (buffers.length >= bytes) {
+                var buf = buffers.splice(0, bytes);
+                if (pending.skip) {
+                    pending.cb();
+                }
+                else {
+                    pending.cb(buf.slice());
+                }
             }
         }
     }
@@ -116,25 +121,27 @@ exports.stream = function (em, eventName) {
             });
         };
         
-        var findLast = null;
-        self.find = function find (search, cb) {
-            if (findLast === null) {
-                getBytes(search.length, function (buf) {
+        self.scan = function find (name, search) {
+            var offset = 0;
+            pending = function () {
+                var buf = buffers.slice(offset);
+                // simple but slow string search
+                for (var i = 0; i <= buf.length - search.length; i++) {
                     for (
-                        var i = 0;
-                        i < search.length && search[i] === buf[i];
-                        i++
+                        var j = 0;
+                        j < search.length && buf[i+j] === search[j];
+                        j++
                     );
-                    if (i === search.length) {
-                        if (cb) cb(new Buffer([]))
+                    if (j === search.length) {
+                        pending = null;
+                        vars.set(name, buffers.slice(0, offset));
+                        buffers.splice(0, offset + j);
+                        next();
+                        break;
                     }
-                });
-            }
-            else {
-                for (var i = findLast.length; until[i] === buf[i]; i--);
-                var span = findLast.length - i;
-                console.log(span);
-            }
+                }
+                offset = i;
+            };
         };
         
         return self;
