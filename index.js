@@ -193,7 +193,7 @@ exports.parse = function parse (buffer) {
         if (typeof size === 'string') {
             size = vars.get(size);
         }
-        var buf = buffer.slice(offset, offset + size);
+        var buf = buffer.slice(offset, Math.min(buffer.length, offset + size));
         offset += size;
         vars.set(name, buf);
         
