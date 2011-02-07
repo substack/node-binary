@@ -195,6 +195,32 @@ exports.parse = function parse (buffer) {
         return self;
     };
     
+    self.scan = function (name, search) {
+        if (typeof search === 'string') {
+            search = new Buffer(search);
+        }
+        else if (!Buffer.isBuffer(search)) {
+            throw new Error('search must be a Buffer or a string');
+        }
+        vars.set(name, null);
+        
+        // simple but slow string search
+        for (var i = 0; i + offset <= buffer.length - search.length; i++) {
+            for (
+                var j = 0;
+                j < search.length && buffer[offset+i+j] === search[j];
+                j++
+            );
+            if (j === search.length) {
+                vars.set(name, buffer.slice(offset, offset + i));
+                break;
+            }
+        }
+        
+        offset += i + search.length;
+        return self;
+    };
+    
     self.flush = function () {
         vars.store = {};
         return self;

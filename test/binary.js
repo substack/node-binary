@@ -556,14 +556,15 @@ exports.scan = function () {
 };
 
 exports.scanBuf = function () {
-    assert.eql(
-        Binary(new Buffer('\x63foo bar\r\nbaz\r\n*'))
-            .word8('a')
-            .scan('l1', new Buffer('\r\n'))
-            .scan('l2', '\r\n')
-            .word8('z')
-            .vars
-        ,
-        { a : 99, l1 : 'foo bar', l2 : 'baz', z : 42 }
-    );
+    var vars = Binary(new Buffer('\x63foo bar\r\nbaz\r\n*'))
+        .word8('a')
+        .scan('l1', new Buffer('\r\n'))
+        .scan('l2', '\r\n')
+        .word8('z')
+        .vars
+    ;
+    assert.eql(vars.a, 99);
+    assert.eql(vars.z, 42);
+    assert.eql(vars.l1.toString(), 'foo bar');
+    assert.eql(vars.l2.toString(), 'baz');
 };
