@@ -141,13 +141,14 @@ exports.stream = function (em, eventName) {
                     );
                     if (j === search.length) {
                         pending = null;
-                        vars.set(name, buffers.slice(0, offset));
-                        buffers.splice(0, offset + j);
+                        vars.set(name, buffers.slice(0, offset + i));
+                        buffers.splice(0, offset + i + j);
                         next();
+                        dispatch();
                         break;
                     }
                 }
-                offset = i;
+                offset += i;
             };
         };
         
