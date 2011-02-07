@@ -554,3 +554,16 @@ exports.scan = function () {
         em.emit('data', new Buffer('\nbaz\r\n*'));
     }, 60);
 };
+
+exports.scanBuf = function () {
+    assert.eql(
+        Binary(new Buffer('\x63foo bar\r\nbaz\r\n*'))
+            .word8('a')
+            .scan('l1', new Buffer('\r\n'))
+            .scan('l2', '\r\n')
+            .word8('z')
+            .vars
+        ,
+        { a : 99, l1 : 'foo bar', l2 : 'baz', z : 42 }
+    );
+};
