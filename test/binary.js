@@ -568,3 +568,31 @@ exports.scanBuf = function () {
     assert.eql(vars.l1.toString(), 'foo bar');
     assert.eql(vars.l2.toString(), 'baz');
 };
+
+exports.scanBufNull = function () {
+    var vars = Binary(new Buffer('\x63foo bar baz'))
+        .word8('a')
+        .scan('b', '\r\n')
+        .word8('c')
+        .vars
+    ;
+    
+    assert.eql(vars.a, 99);
+    assert.eql(vars.b.toString(), 'foo bar baz');
+    assert.ok(vars.c === null);
+};
+
+exports.notEnoughParse = function () {
+    var vars = Binary(new Buffer([1,2]))
+        .word8('a')
+        .word8('b')
+        .word8('c')
+        .word8('d')
+        .vars
+    ;
+    
+    assert.eql(vars.a, 1);
+    assert.eql(vars.b, 2);
+    assert.ok(vars.c === null);
+    assert.ok(vars.d === null);
+};

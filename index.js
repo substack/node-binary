@@ -159,9 +159,14 @@ exports.stream = function (em, eventName) {
 exports.parse = function parse (buffer) {
     var self = words(function (bytes, cb) {
         return function (name) {
-            var buf = buffer.slice(offset, offset + bytes);
-            offset += bytes;
-            vars.set(name, cb(buf));
+            if (offset + bytes <= buffer.length) {
+                var buf = buffer.slice(offset, offset + bytes);
+                offset += bytes;
+                vars.set(name, cb(buf));
+            }
+            else {
+                vars.set(name, null);
+            }
             return self;
         };
     });
@@ -205,18 +210,16 @@ exports.parse = function parse (buffer) {
         vars.set(name, null);
         
         // simple but slow string search
-        for (var i = 0; i + offset <= buffer.length - search.length; i++) {
+        for (var i = 0; i + offset <= buffer.length - search.length + 1; i++) {
             for (
                 var j = 0;
                 j < search.length && buffer[offset+i+j] === search[j];
                 j++
             );
-            if (j === search.length) {
-                vars.set(name, buffer.slice(offset, offset + i));
-                break;
-            }
+            if (j === search.length) break;
         }
         
+        vars.set(name, buffer.slice(offset, offset + i));
         offset += i + search.length;
         return self;
     };
