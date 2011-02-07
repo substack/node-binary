@@ -596,3 +596,16 @@ exports.notEnoughParse = function () {
     assert.ok(vars.c === null);
     assert.ok(vars.d === null);
 };
+
+exports.notEnoughBuf = function () {
+    var vars = Binary(new Buffer([1,2,3,4]))
+        .word8('a')
+        .buffer('b', 10)
+        .word8('c')
+        .vars
+    ;
+    
+    assert.eql(vars.a, 1);
+    assert.eql(vars.b, new Buffer([2,3,4]));
+    assert.ok(vars.c === null);
+};

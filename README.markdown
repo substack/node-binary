@@ -57,6 +57,10 @@ Parse a static buffer in one pass. Returns a chainable interface with the
 methods below plus a `vars` field to get at the variable stash as the last item
 in a chain.
 
+In parse mode, methods will set their keys to `null` if the buffer isn't big
+enough except `buffer()` and `scan()` which read up up to the end of the buffer
+and stop.
+
 Binary.stream(emitter, eventName='data')
 ----------------------------------------
 
