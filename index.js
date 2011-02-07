@@ -122,6 +122,13 @@ exports.stream = function (em, eventName) {
         };
         
         self.scan = function find (name, search) {
+            if (typeof search === 'string') {
+                search = new Buffer(search);
+            }
+            else if (!Buffer.isBuffer(search)) {
+                throw new Error('search must be a Buffer or a string');
+            }
+            
             var offset = 0;
             pending = function () {
                 var buf = buffers.slice(offset);

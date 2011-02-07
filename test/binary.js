@@ -530,12 +530,14 @@ exports.scan = function () {
     var em = new EventEmitter;
     Binary(em)
         .word8('a')
-        .scan('line', new Buffer('\r\n'))
+        .scan('l1', new Buffer('\r\n'))
+        .scan('l2', '\r\n')
         .word8('z')
         .tap(function (vars) {
             clearTimeout(to);
             assert.eql(vars.a, 99);
-            assert.eql(vars.line.toString(), 'foo bar');
+            assert.eql(vars.l1.toString(), 'foo bar');
+            assert.eql(vars.l2.toString(), 'baz');
             assert.eql(vars.z, 42);
         })
     ;
@@ -549,6 +551,6 @@ exports.scan = function () {
     }, 40);
     
     setTimeout(function () {
-        em.emit('data', new Buffer('\n*'));
+        em.emit('data', new Buffer('\nbaz\r\n*'));
     }, 60);
 };

@@ -100,6 +100,21 @@ slice in the variable stash at `key`. If `size` is a string, use the value at
 `vars[size]`. The key follows the same dotted address rules as the word
 functions.
 
+scan(key, buffer)
+-----------------
+
+Search for `buffer` in the stream and store all the intervening data in the
+stash at at `key`, excluding the search buffer. If `buffer` passed as a string,
+it will be converted into a Buffer internally.
+
+For example, to read in a line you can just do:
+    Binary(em)
+        .scan('line', new Buffer('\r\n'))
+        .tap(function (vars) {
+            console.log(vars.line)
+        })
+    ;
+
 tap(cb)
 -------
 
