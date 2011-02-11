@@ -94,6 +94,7 @@ exports.stream = function (em, eventName) {
             if (r !== undefined) s.handlers = r;
             
             var ch = s.chain();
+            ch.vars = vars.store;
             cb.call(ch, function () {
                 end = true;
                 next();
