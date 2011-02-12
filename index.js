@@ -201,6 +201,15 @@ exports.parse = function parse (buffer) {
         return self;
     };
     
+    self.skip = function (bytes) {
+        if (typeof bytes === 'string') {
+            bytes = vars.get(bytes);
+        }
+        offset += bytes;
+        
+        return self;
+    };
+    
     self.scan = function (name, search) {
         if (typeof search === 'string') {
             search = new Buffer(search);

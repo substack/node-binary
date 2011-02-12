@@ -6,9 +6,10 @@ exports.parse = function (assert) {
         assert.fail('never tapped');
     }, 50);
     
-    var res = Binary.parse(new Buffer([ 97, 98, 99, 1, 2, 3 ]))
+    var res = Binary.parse(new Buffer([ 97, 98, 99, 99, 99, 99, 1, 2, 3 ]))
         .word8('a')
         .word16be('bc')
+        .skip(3)
         .buffer('def', 3)
         .tap(function (vars) {
             clearTimeout(to);
