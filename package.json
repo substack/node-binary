@@ -1,6 +1,6 @@
 {
     "name" : "binary",
-    "version" : "0.1.6",
+    "version" : "0.1.7",
     "description" : "Unpack multibyte binary values from buffers",
     "main" : "./index.js",
     "repository" : {
@@ -23,7 +23,7 @@
     "dependencies" : {
         "chainsaw" : ">=0.0.4",
         "put" : ">=0.0.1",
-        "buffers" : ">0.0.1"
+        "buffers" : ">=0.0.1"
     },
     "devDependencies" : {
         "seq" : ">=0.1.7",
