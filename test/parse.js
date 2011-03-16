@@ -1,7 +1,8 @@
 var Binary = require('binary');
 var EventEmitter = require('events').EventEmitter;
+var assert = require('assert');
 
-exports.parse = function (assert) {
+exports.parse = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);
@@ -28,7 +29,7 @@ exports.parse = function (assert) {
     });
 };
 
-exports.loop = function (assert) {
+exports.loop = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
     }, 50);

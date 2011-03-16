@@ -1,6 +1,7 @@
+var assert = require('assert');
 var Binary = require('binary');
 
-exports.builder = function (assert) {
+exports.builder = function () {
     var buf = Binary.put()
         .word16be(1337)
         .put(new Buffer([ 7, 8, 9 ]))
