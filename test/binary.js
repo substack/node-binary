@@ -398,6 +398,59 @@ exports.loop = function () {
     }, 90);
 };
 
+
+exports.loopscan = function () {
+    var em = new EventEmitter;
+    var times = 0;
+    var to = setTimeout(function () {
+        assert.fail('loop never terminated');
+    }, 500);
+
+    Binary.stream(em)
+        .loop(function (end) {
+            var vars_ = this.vars;
+            this
+                .scan('filler', 'BEGINMSG')
+                .buffer('cmd', 3)
+                .word8('num')
+                .tap(function (vars) {
+                    assert.ok(vars === vars_);
+                    if (vars.num != 0x02 && vars.num != 0x06) {
+                        assert.eql(vars.filler.length, 0);
+                    }
+                    times ++;
+                    if (vars.cmd.toString('ascii') == 'end') end();
+                })
+            ;
+        })
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars.cmd.toString('ascii'), 'end');
+			assert.eql(vars.num, 0x08);
+            assert.eql(times, 8);
+        })
+    ;
+
+    setTimeout(function () {
+        em.emit('data', new Buffer("BEGINMSGcmd\x01" +
+                                   "GARBAGEDATAXXXX" +
+                                   "BEGINMSGcmd\x02" +
+                                   "BEGINMSGcmd\x03", 'ascii'));
+    }, 10);
+
+    setTimeout(function () {
+        em.emit('data', new Buffer("BEGINMSGcmd\x04" +
+                                   "BEGINMSGcmd\x05" +
+                                   "GARBAGEDATAXXXX" +
+                                   "BEGINMSGcmd\x06", 'ascii'));
+        em.emit('data', new Buffer("BEGINMSGcmd\x07", 'ascii'));
+    }, 20);
+
+    setTimeout(function () {
+        em.emit('data', new Buffer("BEGINMSGend\x08", 'ascii'));
+    }, 30);
+};
+
 exports.getBuffer = function () {
     var t1 = setTimeout(function () {
         assert.fail('first buffer never finished');
