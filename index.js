@@ -151,6 +151,7 @@ exports.stream = function (em, eventName) {
                 }
                 offset += i;
             };
+            dispatch();
         };
         
         return self;
