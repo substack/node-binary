@@ -240,6 +240,10 @@ exports.parse = function parse (buffer) {
         return self;
     };
     
+    self.eof = function () {
+        return offset >= buffer.length;
+    };
+    
     return self;
 };
 
