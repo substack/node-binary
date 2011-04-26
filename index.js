@@ -77,6 +77,13 @@ exports.stream = function (em, eventName) {
             saw.nest(cb, vars.store);
         };
         
+        self.into = function (key, cb) {
+            if (!vars.get(key)) {
+                vars.set(key, {});
+            }
+            saw.nest(cb, vars.get(key));
+        };
+        
         self.flush = function () {
             vars.store = {};
             next();
@@ -179,6 +186,17 @@ exports.parse = function parse (buffer) {
     
     self.tap = function (cb) {
         cb.call(self, vars.store);
+        return self;
+    };
+    
+    self.into = function (key, cb) {
+        if (!vars.get(key)) {
+            vars.set(key, {});
+        }
+        var parent = vars;
+        vars = Vars(parent.get(key));
+        cb.call(self, vars.store);
+        vars = parent;
         return self;
     };
     
