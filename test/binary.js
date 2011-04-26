@@ -6,7 +6,7 @@ var assert = require('assert');
 exports.fromBuffer = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     Binary(new Buffer([ 97, 98, 99 ]))
         .word8('a')
@@ -21,7 +21,7 @@ exports.fromBuffer = function () {
 exports.dots = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     Binary.parse(new Buffer([ 97, 98, 99, 100, 101, 102 ]))
         .word8('a')
@@ -45,7 +45,7 @@ exports.dots = function () {
 exports.flush = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     Binary.parse(new Buffer([ 97, 98, 99, 100, 101, 102 ]))
         .word8('a')
@@ -63,7 +63,7 @@ exports.flush = function () {
 exports.immediate = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     var em = new EventEmitter;
     Binary.stream(em, 'moo')
@@ -81,7 +81,7 @@ exports.immediate = function () {
 exports.deferred = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     var em = new EventEmitter;
     Binary.stream(em)
@@ -101,7 +101,7 @@ exports.deferred = function () {
 exports.split = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     var em = new EventEmitter;
     Binary.stream(em)
@@ -135,7 +135,7 @@ exports.split = function () {
 exports.posls = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     // note: can't store 12667700813876161 exactly in an ieee float
     
@@ -166,7 +166,7 @@ exports.posls = function () {
 exports.negls = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     // note: can't store -12667700813876161 exactly in an ieee float
     
@@ -197,7 +197,7 @@ exports.negls = function () {
 exports.posbs = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     // note: can't store 12667700813876161 exactly in an ieee float
     
@@ -228,7 +228,7 @@ exports.posbs = function () {
 exports.negbs = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     // note: can't store -12667700813876161 exactly in an ieee float
     
@@ -259,7 +259,7 @@ exports.negbs = function () {
 exports.lu = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     // note: can't store -12667700813876161 exactly in an ieee float
     
@@ -307,7 +307,7 @@ exports.lu = function () {
 exports.bu = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');
-    }, 50);
+    }, 500);
     
     // note: can't store -12667700813876161 exactly in an ieee float
     
