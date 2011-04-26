@@ -664,3 +664,39 @@ exports.notEnoughBuf = function () {
     assert.eql(vars.b, new Buffer([2,3,4]));
     assert.ok(vars.c === null);
 };
+
+exports.nested = function () {
+    var to = setTimeout(function () {
+        assert.fail('never finished');
+    }, 500);
+    
+    var insideDone = false;
+    
+    var em = new EventEmitter;
+    Binary.stream(em)
+        .word16be('ab')
+        .tap(function () {
+            this
+                .word8('c')
+                .word8('d')
+                .tap(function () {
+                    insideDone = true;
+                })
+            ;
+        })
+        .tap(function (vars) {
+            assert.ok(insideDone);
+            assert.eql(vars.c, 'c'.charCodeAt(0));
+            assert.eql(vars.d, 'd'.charCodeAt(0));
+            
+            clearTimeout(to);
+        })
+    ;
+    
+    var strs = [ 'abc', 'def', 'hi', 'jkl' ];
+    var iv = setInterval(function () {
+        var s = strs.shift();
+        if (s) em.emit('data', new Buffer(s));
+        else clearInterval(iv);
+    }, 50);
+};
