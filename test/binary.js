@@ -700,3 +700,40 @@ exports.nested = function () {
         else clearInterval(iv);
     }, 50);
 };
+
+exports.into = function () {
+    var to = setTimeout(function () {
+        assert.fail('never finished');
+    }, 500);
+    
+    var buf = new Buffer([ 1, 2, 3, 4, 5, 6 ])
+    
+    Binary.parse(buf)
+        .into('moo', function () {
+            this
+                .word8('x')
+                .word8('y')
+                .word8('z')
+            ;
+        })
+        .tap(function (vars) {
+            assert.eql(vars, { moo : { x : 1, y : 2, z : 3 } });
+        })
+        .word8('w')
+        .tap(function (vars) {
+            assert.eql(vars, {
+                moo : { x : 1, y : 2, z : 3 },
+                w : 4,
+            });
+        })
+        .word8('x')
+        .tap(function (vars) {
+            assert.eql(vars, {
+                moo : { x : 1, y : 2, z : 3 },
+                w : 4,
+                x : 5,
+            });
+            clearTimeout(to);
+        })
+    ;
+}
