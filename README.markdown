@@ -13,6 +13,7 @@ Examples
 
 parse.js
 --------
+
     var buf = new Buffer([ 97, 98, 99, 100, 101, 102, 0 ]);
     
     var Binary = require('binary');
@@ -112,6 +113,7 @@ stash at at `key`, excluding the search buffer. If `buffer` passed as a string,
 it will be converted into a Buffer internally.
 
 For example, to read in a line you can just do:
+
     Binary(em)
         .scan('line', new Buffer('\r\n'))
         .tap(function (vars) {
@@ -124,6 +126,14 @@ tap(cb)
 
 The callback `cb` is provided with the variable stash from all the previous
 actions once they've all finished.
+
+You can nest additional actions onto `this` inside the callback.
+
+into(key, cb)
+-------------
+
+Like `.tap()`, except all nested actions will assign into a `key` in the `vars`
+stash.
 
 loop(cb)
 --------

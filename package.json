@@ -1,6 +1,6 @@
 {
     "name" : "binary",
-    "version" : "0.1.9",
+    "version" : "0.2.0",
     "description" : "Unpack multibyte binary values from buffers",
     "main" : "./index.js",
     "repository" : {
@@ -33,5 +33,7 @@
         "test" : "expresso"
     },
     "license" : "MIT/X11",
-    "engine" : ["node >=0.2.0"]
+    "engine" : {
+        "node" : ">=0.2.0"
+    }
 }
