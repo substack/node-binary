@@ -78,10 +78,16 @@ exports.stream = function (em, eventName) {
         };
         
         self.into = function (key, cb) {
-            if (!vars.get(key)) {
-                vars.set(key, {});
-            }
-            saw.nest(cb, vars.get(key));
+            if (!vars.get(key)) vars.set(key, {});
+            var parent = vars;
+            vars = Vars(parent.get(key));
+            
+            saw.nest(function () {
+                cb.apply(this, arguments);
+                this.tap(function () {
+                    vars = parent;
+                });
+            }, vars.store);
         };
         
         self.flush = function () {
