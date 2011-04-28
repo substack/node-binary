@@ -360,13 +360,13 @@ exports.loop = function () {
     }, 500);
     
     Binary.stream(em)
-        .loop(function (end) {
-            var vars_ = this.vars;
+        .loop(function (end, vars) {
+            assert.ok(vars === this.vars);
             this
                 .word16lu('a')
                 .word8u('b')
                 .word8s('c')
-                .tap(function (vars) {
+                .tap(function (vars_) {
                     assert.ok(vars === vars_);
                     times ++;
                     if (vars.c < 0) end();

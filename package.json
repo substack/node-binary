@@ -21,7 +21,7 @@
         "url" : "http://substack.net"
     },
     "dependencies" : {
-        "chainsaw" : ">=0.0.4",
+        "chainsaw" : ">=0.0.7",
         "put" : ">=0.0.1",
         "buffers" : ">=0.0.1"
     },

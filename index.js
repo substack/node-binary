@@ -95,22 +95,19 @@ exports.stream = function (em, eventName) {
             next();
         };
         
-        self.loop = function loop (cb) {
+        self.loop = function (cb) {
             var end = false;
             
-            var s = Chainsaw.saw(builder, {});
-            s.on('end', function () {
-                if (!end) self.loop(cb)
-            });
-            
-            var r = builder.call(s.handlers, s);
-            if (r !== undefined) s.handlers = r;
-            
-            var ch = s.chain();
-            ch.vars = vars.store;
-            cb.call(ch, function () {
-                end = true;
-                next();
+            saw.nest(false, function loop () {
+                this.vars = vars.store;
+                cb.call(this, function () {
+                    end = true;
+                    next();
+                }, vars.store);
+                this.tap(function () {
+                    if (end) saw.next()
+                    else loop.call(this)
+                });
             }, vars.store);
         };
         
