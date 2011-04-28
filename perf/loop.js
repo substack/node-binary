@@ -1,5 +1,5 @@
 var Seq = require('seq');
-var Hash = require('traverse/hash');
+var Hash = require('hashish');
 var EventEmitter = require('events').EventEmitter;
 
 var Bin = require('binary');
