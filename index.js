@@ -48,16 +48,16 @@ exports.stream = function (em, eventName) {
             if (buffers.length >= bytes) {
                 var buf;
                 if (offset == null) {
-                  buf = buffers.splice(0, bytes);
-                  if (!pending.skip) {
-                    buf = buf.slice();
-                  }
+                    buf = buffers.splice(0, bytes);
+                    if (!pending.skip) {
+                        buf = buf.slice();
+                    }
                 }
                 else {
-                  if (!pending.skip) {
-                    buf = buffers.slice(offset, bytes);
-                  }
-                  offset = bytes;
+                    if (!pending.skip) {
+                        buf = buffers.slice(offset, bytes);
+                    }
+                    offset = bytes;
                 }
                 
                 if (pending.skip) {
@@ -167,12 +167,18 @@ exports.stream = function (em, eventName) {
                     if (j === search.length) {
                         pending = null;
                         if (offset != null) {
-                          vars.set(name, buffers.slice(offset, offset + taken + i));
-                          offset += taken + i + j;
+                            vars.set(
+                                name,
+                                buffers.slice(offset, offset + taken + i)
+                            );
+                            offset += taken + i + j;
                         }
                         else {
-                          vars.set(name, buffers.slice(0, taken + i));
-                          buffers.splice(0, taken + i + j);
+                            vars.set(
+                                name,
+                                buffers.slice(0, taken + i)
+                            );
+                            buffers.splice(0, taken + i + j);
                         }
                         next();
                         dispatch();
@@ -185,13 +191,13 @@ exports.stream = function (em, eventName) {
         };
         
         self.peek = function (cb) {
-          offset = 0;
-          saw.nest(function () {
-            cb.call(this, vars.store);
-            this.tap(function () {
-              offset = null;
+            offset = 0;
+            saw.nest(function () {
+                cb.call(this, vars.store);
+                this.tap(function () {
+                    offset = null;
+                });
             });
-          });
         };
         
         return self;
