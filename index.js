@@ -36,21 +36,35 @@ exports.stream = function (em, eventName) {
         dispatch();
     });
     
+    var offset = null;
     function dispatch () {
         if (!pending) return;
         if (typeof pending === 'function') {
             pending();
         }
         else {
-            var bytes = pending.bytes;
+            var bytes = offset + pending.bytes;
             
             if (buffers.length >= bytes) {
-                var buf = buffers.splice(0, bytes);
+                var buf;
+                if (offset == null) {
+                  buf = buffers.splice(0, bytes);
+                  if (!pending.skip) {
+                    buf = buf.slice();
+                  }
+                }
+                else {
+                  if (!pending.skip) {
+                    buf = buffers.slice(offset, bytes);
+                  }
+                  offset = bytes;
+                }
+                
                 if (pending.skip) {
                     pending.cb();
                 }
                 else {
-                    pending.cb(buf.slice());
+                    pending.cb(buf);
                 }
             }
         }
@@ -140,9 +154,9 @@ exports.stream = function (em, eventName) {
                 throw new Error('search must be a Buffer or a string');
             }
             
-            var offset = 0;
+            var taken = 0;
             pending = function () {
-                var buf = buffers.slice(offset);
+                var buf = buffers.slice(offset + taken);
                 // simple but slow string search
                 for (var i = 0; i <= buf.length - search.length; i++) {
                     for (
@@ -152,16 +166,32 @@ exports.stream = function (em, eventName) {
                     );
                     if (j === search.length) {
                         pending = null;
-                        vars.set(name, buffers.slice(0, offset + i));
-                        buffers.splice(0, offset + i + j);
+                        if (offset != null) {
+                          vars.set(name, buffers.slice(offset, offset + taken + i));
+                          offset += taken + i + j;
+                        }
+                        else {
+                          vars.set(name, buffers.slice(0, taken + i));
+                          buffers.splice(0, taken + i + j);
+                        }
                         next();
                         dispatch();
                         break;
                     }
                 }
-                offset += i;
+                taken += i;
             };
             dispatch();
+        };
+        
+        self.peek = function (cb) {
+          offset = 0;
+          saw.nest(function () {
+            cb.call(this, vars.store);
+            this.tap(function () {
+              offset = null;
+            });
+          });
         };
         
         return self;
@@ -253,6 +283,13 @@ exports.parse = function parse (buffer) {
         
         vars.set(name, buffer.slice(offset, offset + i));
         offset += i + search.length;
+        return self;
+    };
+    
+    self.peek = function (cb) {
+        var was = offset;
+        cb.call(self, vars.store);
+        offset = was;
         return self;
     };
     
