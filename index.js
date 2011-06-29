@@ -156,35 +156,29 @@ exports.stream = function (em, eventName) {
             
             var taken = 0;
             pending = function () {
-                var buf = buffers.slice(offset + taken);
-                // simple but slow string search
-                for (var i = 0; i <= buf.length - search.length; i++) {
-                    for (
-                        var j = 0;
-                        j < search.length && buf[i+j] === search[j];
-                        j++
-                    );
-                    if (j === search.length) {
-                        pending = null;
-                        if (offset != null) {
-                            vars.set(
-                                name,
-                                buffers.slice(offset, offset + taken + i)
-                            );
-                            offset += taken + i + j;
-                        }
-                        else {
-                            vars.set(
-                                name,
-                                buffers.slice(0, taken + i)
-                            );
-                            buffers.splice(0, taken + i + j);
-                        }
-                        next();
-                        dispatch();
-                        break;
+                var pos = buffers.find(search, offset + taken);
+                var i = pos-offset-taken;
+                if (pos !== -1) {
+                    pending = null;
+                    if (offset != null) {
+                        vars.set(
+                            name,
+                            buffers.slice(offset, offset + taken + i)
+                        );
+                        offset += taken + i + search.length;
                     }
-                }
+                    else {
+                        vars.set(
+                            name,
+                            buffers.slice(0, taken + i)
+                        );
+                        buffers.splice(0, taken + i + search.length);
+                    }
+                    next();
+                    dispatch();
+                } else {
+                    i = Math.max(buffers.length - search.length - offset - taken, 0);
+				}
                 taken += i;
             };
             dispatch();
