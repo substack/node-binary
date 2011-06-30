@@ -156,7 +156,7 @@ exports.stream = function (em, eventName) {
             
             var taken = 0;
             pending = function () {
-                var pos = buffers.find(search, offset + taken);
+                var pos = buffers.indexOf(search, offset + taken);
                 var i = pos-offset-taken;
                 if (pos !== -1) {
                     pending = null;
