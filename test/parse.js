@@ -1,4 +1,4 @@
-var Binary = require('binary');
+var Binary = require('../');
 var EventEmitter = require('events').EventEmitter;
 var assert = require('assert');
 

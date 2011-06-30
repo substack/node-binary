@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Binary = require('binary');
+var Binary = require('../');
 
 exports.builder = function () {
     var buf = Binary.put()
