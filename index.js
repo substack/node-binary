@@ -121,7 +121,7 @@ exports.stream = function (em, eventName) {
                 this.tap(function () {
                     if (end) saw.next()
                     else loop.call(this)
-                });
+                }.bind(this));
             }, vars.store);
         };
         
