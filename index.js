@@ -75,7 +75,7 @@ exports.stream = function (em, eventName) {
     var done = false;
     em.on('end', function () { done = true });
     
-    return Chainsaw(function builder (saw) {
+    return Chainsaw.light(function builder (saw) {
         function next () { if (!done) saw.next() }
         
         var self = words(function (bytes, cb) {
