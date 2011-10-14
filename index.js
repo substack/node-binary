@@ -38,7 +38,10 @@ exports.stream = function (em, eventName) {
     
     var offset = null;
     function dispatch () {
-        if (!pending) return;
+        if (!pending) {
+            if (caughtEnd) done = true;
+            return;
+        }
         if (typeof pending === 'function') {
             pending();
         }
@@ -72,8 +75,10 @@ exports.stream = function (em, eventName) {
     
     var vars = Vars();
     
-    var done = false;
-    em.on('end', function () { done = true });
+    var done = false, caughtEnd = false;
+    em.on('end', function () {
+        caughtEnd = true
+    });
     
     return Chainsaw.light(function builder (saw) {
         function next () { if (!done) saw.next() }
