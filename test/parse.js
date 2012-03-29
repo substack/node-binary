@@ -29,6 +29,32 @@ exports.parse = function () {
     });
 };
 
+exports.toString = function () {
+    var to = setTimeout(function () {
+        assert.fail('never tapped');
+    }, 50);
+    
+    var res = Binary.parse(new Buffer("This is a test string (èç€) with some special chars"))
+        .toString('a')
+        .toString('b', 0, 14)
+        .toString('c', 15)
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.eql(vars, {
+                a : "This is a test string (èç€) with some special chars",
+                b : "This is a test",
+                c : "string (èç€) with some special chars"
+            });
+        })
+        .vars
+    ;
+    assert.eql(res, {
+        a : "This is a test string (èç€) with some special chars",
+        b : "This is a test",
+        c : "string (èç€) with some special chars"
+    });
+};
+
 exports.loop = function () {
     var to = setTimeout(function () {
         assert.fail('never tapped');

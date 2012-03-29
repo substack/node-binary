@@ -307,6 +307,11 @@ exports.parse = function parse (buffer) {
         return offset >= buffer.length;
     };
     
+    self.toString = function(name, start, end, encoding) {
+        vars.set(name, buffer.toString(encoding, start, end));
+        return self;
+    };
+    
     return self;
 };
 
