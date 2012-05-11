@@ -26,11 +26,11 @@
         "buffers" : "0.1.x"
     },
     "devDependencies" : {
-        "seq" : ">=0.2.5 <0.3",
-        "expresso" : "=0.7.x"
+        "seq" : "~0.2.5",
+        "tap" : "~0.2.4"
     },
     "scripts" : {
-        "test" : "expresso"
+        "test" : "tap test/*.js"
     },
     "license" : "MIT/X11",
     "engine" : {

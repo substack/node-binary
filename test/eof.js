@@ -1,14 +1,12 @@
-var Binary = require('../');
+var binary = require('../');
+var test = require('tap').test;
 var EventEmitter = require('events').EventEmitter;
-var assert = require('assert');
 
-exports.eof = function () {
-    var to = setTimeout(function () {
-        assert.fail('never finished');
-    }, 1000);
+test('eof', function (t) {
+    t.plan(4);
     
     var stream = new EventEmitter;
-    Binary.stream(stream)
+    binary.stream(stream)
         .buffer('sixone', 5)
         .peek(function () {
             this.word32le('len');
@@ -16,14 +14,16 @@ exports.eof = function () {
         .buffer('buf', 'len')
         .word8('x')
         .tap(function (vars) {
-            clearTimeout(to);
-            assert.eql(vars.sixone, new Buffer([ 6, 1, 6, 1, 6 ]));
-            assert.eql(vars.buf.length, vars.len);
-            assert.eql(
+            t.same(
+                [].slice.call(vars.sixone),
+                [].slice.call(new Buffer([ 6, 1, 6, 1, 6 ]))
+            );
+            t.same(vars.buf.length, vars.len);
+            t.same(
                 [].slice.call(vars.buf),
                 [ 9, 0, 0, 0, 97, 98, 99, 100, 101 ]
             );
-            assert.eql(vars.x, 102);
+            t.same(vars.x, 102);
         })
     ;
     
@@ -38,4 +38,4 @@ exports.eof = function () {
     });
     
     stream.emit('end');
-};
+});
