@@ -2,20 +2,34 @@ var Chainsaw = require('chainsaw');
 var EventEmitter = require('events').EventEmitter;
 var Buffers = require('buffers');
 var Vars = require('./lib/vars.js');
+var Stream = require('stream').Stream;
 
 exports = module.exports = function (bufOrEm, eventName) {
     if (Buffer.isBuffer(bufOrEm)) {
         return exports.parse(bufOrEm);
     }
     else {
-        return exports.stream(bufOrEm, eventName);
+        var s = exports.stream();
+        if (bufOrEm && bufOrEm.pipe) {
+            bufOrEm.pipe(s);
+        }
+        else if (bufOrEm) {
+            bufOrEm.on(eventName || 'data', function (buf) {
+                s.write(buf);
+            });
+            
+            bufOrEm.on('end', function () {
+                s.end();
+            });
+        }
+        return s;
     }
 };
 
 exports.put = require('put');
 
-exports.stream = function (em, eventName) {
-    if (eventName === undefined) eventName = 'data';
+exports.stream = function (input) {
+    if (input) return exports.apply(null, arguments);
     
     var pending = null;
     function getBytes (bytes, cb, skip) {
@@ -29,12 +43,6 @@ exports.stream = function (em, eventName) {
         };
         dispatch();
     }
-    
-    var buffers = Buffers();
-    em.on(eventName, function (buf) {
-        buffers.push(buf);
-        dispatch();
-    });
     
     var offset = null;
     function dispatch () {
@@ -73,14 +81,7 @@ exports.stream = function (em, eventName) {
         }
     }
     
-    var vars = Vars();
-    
-    var done = false, caughtEnd = false;
-    em.on('end', function () {
-        caughtEnd = true
-    });
-    
-    return Chainsaw.light(function builder (saw) {
+    function builder (saw) {
         function next () { if (!done) saw.next() }
         
         var self = words(function (bytes, cb) {
@@ -200,7 +201,28 @@ exports.stream = function (em, eventName) {
         };
         
         return self;
-    });
+    };
+    
+    var stream = Chainsaw.light(builder);
+    stream.writable = true;
+    
+    var buffers = Buffers();
+    
+    stream.write = function (buf) {
+        buffers.push(buf);
+        dispatch();
+    };
+    
+    var vars = Vars();
+    
+    var done = false, caughtEnd = false;
+    stream.end = function () {
+        caughtEnd = true;
+    };
+    
+    stream.pipe = Stream.prototype.pipe;
+    
+    return stream;
 };
 
 exports.parse = function parse (buffer) {
