@@ -1,7 +1,6 @@
-var Binary = require('binary');
-var stdin = process.openStdin();
+var binary = require('binary');
 
-Binary.stream(stdin)
+var ws = binary()
     .word32lu('x')
     .word16bs('y')
     .word16bu('z')
@@ -9,3 +8,5 @@ Binary.stream(stdin)
         console.dir(vars);
     })
 ;
+process.stdin.pipe(ws);
+process.stdin.resume();
