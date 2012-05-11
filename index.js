@@ -25,8 +25,6 @@ exports = module.exports = function (bufOrEm, eventName) {
     return s;
 };
 
-exports.put = require('put');
-
 exports.stream = function (input) {
     if (input) return exports.apply(null, arguments);
     
