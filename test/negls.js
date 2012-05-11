@@ -18,7 +18,6 @@ test('negls', function (t) {
         .word32ls('c')
         .word64ls('d')
         .tap(function (vars) {
-            clearTimeout(to);
             t.same(vars.a, -30);
             t.same(vars.b, -2341);
             t.same(vars.c, -789012);
