@@ -8,6 +8,8 @@ This module is a cleaner and more complete version of
 [bufferlist](https://github.com/substack/node-bufferlist)'s binary module that
 runs on pre-allocated buffers instead of a linked list.
 
+[![build status](https://secure.travis-ci.org/substack/node-binary.png)](http://travis-ci.org/substack/node-binary)
+
 Examples
 ========
 
