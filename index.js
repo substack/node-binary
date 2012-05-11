@@ -8,22 +8,21 @@ exports = module.exports = function (bufOrEm, eventName) {
     if (Buffer.isBuffer(bufOrEm)) {
         return exports.parse(bufOrEm);
     }
-    else {
-        var s = exports.stream();
-        if (bufOrEm && bufOrEm.pipe) {
-            bufOrEm.pipe(s);
-        }
-        else if (bufOrEm) {
-            bufOrEm.on(eventName || 'data', function (buf) {
-                s.write(buf);
-            });
-            
-            bufOrEm.on('end', function () {
-                s.end();
-            });
-        }
-        return s;
+    
+    var s = exports.stream();
+    if (bufOrEm && bufOrEm.pipe) {
+        bufOrEm.pipe(s);
     }
+    else if (bufOrEm) {
+        bufOrEm.on(eventName || 'data', function (buf) {
+            s.write(buf);
+        });
+        
+        bufOrEm.on('end', function () {
+            s.end();
+        });
+    }
+    return s;
 };
 
 exports.put = require('put');
@@ -221,6 +220,9 @@ exports.stream = function (input) {
     };
     
     stream.pipe = Stream.prototype.pipe;
+    Object.getOwnPropertyNames(EventEmitter.prototype).forEach(function (name) {
+        stream[name] = EventEmitter.prototype[name];
+    });
     
     return stream;
 };
