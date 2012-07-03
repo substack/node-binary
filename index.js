@@ -216,6 +216,9 @@ exports.stream = function (input) {
     stream.end = function () {
         caughtEnd = true;
     };
+	stream.destroy = function () {
+		caughtEnd = true;
+	};
     
     stream.pipe = Stream.prototype.pipe;
     Object.getOwnPropertyNames(EventEmitter.prototype).forEach(function (name) {
