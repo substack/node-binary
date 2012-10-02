@@ -26,7 +26,10 @@
     },
     "devDependencies" : {
         "seq" : "~0.2.5",
-        "tap" : "~0.2.4"
+        "tap" : "~0.2.4",
+        "hashish" : "~0.0.4",
+        "binary" : "~0.3.0",
+        "bufferlist" : "~0.1.0"
     },
     "scripts" : {
         "test" : "tap test/*.js"
