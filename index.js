@@ -131,6 +131,8 @@ exports.stream = function (input) {
         self.buffer = function (name, bytes) {
             if (typeof bytes === 'string') {
                 bytes = vars.get(bytes);
+            } else if (bytes === undefined || bytes !== bytes) {
+                bytes = 0;
             }
             
             getBytes(bytes, function (buf) {
@@ -142,6 +144,8 @@ exports.stream = function (input) {
         self.skip = function (bytes) {
             if (typeof bytes === 'string') {
                 bytes = vars.get(bytes);
+            } else if (bytes === undefined || bytes !== bytes) {
+                bytes = 0;
             }
             
             getBytes(bytes, function () {
@@ -272,6 +276,8 @@ exports.parse = function parse (buffer) {
     self.buffer = function (name, size) {
         if (typeof size === 'string') {
             size = vars.get(size);
+        } else if (size === undefined || size !== size) {
+            size = 0;
         }
         var buf = buffer.slice(offset, Math.min(buffer.length, offset + size));
         offset += size;
@@ -283,6 +289,8 @@ exports.parse = function parse (buffer) {
     self.skip = function (bytes) {
         if (typeof bytes === 'string') {
             bytes = vars.get(bytes);
+        } else if (bytes === undefined || bytes !== bytes) {
+            bytes = 0;
         }
         offset += bytes;
         
