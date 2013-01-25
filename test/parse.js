@@ -52,3 +52,17 @@ test('loop', function (t) {
         y : 9,
     });
 });
+
+test('NaN', function(t) {
+    t.plan(3);
+    var res = binary.parse(new Buffer([ 106, 35 ]))
+        .buffer('a', NaN)
+        .word8('b')
+        .skip(NaN)
+        .word8('c')
+        .vars
+    ;
+    t.equal(res.a.length, 0);
+    t.equal(res.b, 106);
+    t.equal(res.c, 35);
+});
