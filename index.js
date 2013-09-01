@@ -371,7 +371,7 @@ function decodeLEs (bytes) {
 function words (decode) {
     var self = {};
     
-    [ 1, 2, 4, 8 ].forEach(function (bytes) {
+    [ 1, 2, 3, 4, 8 ].forEach(function (bytes) {
         var bits = bytes * 8;
         
         self['word' + bits + 'le']
