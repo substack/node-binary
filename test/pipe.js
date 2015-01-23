@@ -3,7 +3,7 @@ var test = require('tap').test;
 var Stream = require('stream').Stream;
 
 test('loop', function (t) {
-    t.plan(3 * 2 + 1);
+    t.plan(4 * 2 + 1);
     
     var rs = new Stream;
     rs.readable = true;

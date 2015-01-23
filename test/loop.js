@@ -3,7 +3,7 @@ var test = require('tap').test;
 var EventEmitter = require('events').EventEmitter;
 
 test('loop', function (t) {
-    t.plan(3 * 2 + 1);
+    t.plan(4 * 2 + 1);
     
     var em = new EventEmitter;
     
