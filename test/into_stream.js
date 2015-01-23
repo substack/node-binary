@@ -1,5 +1,5 @@
 var binary = require('../');
-var test = require('tap').test;
+var test = require('tape').test;
 var EventEmitter = require('events').EventEmitter;
 
 test('into stream', function (t) {
