@@ -1,5 +1,5 @@
 var binary = require('../');
-var test = require('tap').test;
+var test = require('tape').test;
 
 test('posbs', function (t) {
     t.plan(4);
