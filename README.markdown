@@ -110,6 +110,16 @@ slice in the variable stash at `key`. If `size` is a string, use the value at
 `vars[size]`. The key follows the same dotted address rules as the word
 functions.
 
+b.skip(size)
+------------
+
+Skip the next `size` bytes
+
+b.peek(cb)
+--------
+
+Pass a callback function that returns the current variable stash
+
 b.scan(key, buffer)
 -------------------
 
